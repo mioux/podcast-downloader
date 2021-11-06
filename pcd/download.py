@@ -35,8 +35,8 @@ def dl(config):
                     curs.execute("SELECT count(*) FROM downloaded WHERE uuid = ? AND url = ?", (key, href))
 
                     if curs.fetchone()[0] == 0 and do_download == True:
-                        print("Downloading: " + file_dest)
                         file_dest = os.path.join(dl_path, date_prefix + format_filename(title) + pathlib.Path(href).suffix)
+                        print("Downloading: " + file_dest)
                         file_content = requests.get(href)
                         os.makedirs(dl_path, exist_ok=True)
                         with open(file_dest, 'wb') as fd:
