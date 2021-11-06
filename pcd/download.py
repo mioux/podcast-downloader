@@ -1,7 +1,7 @@
 #!/bin/env python3
 
 #from urllib import request
-import feedparser, os, sqlite3, requests, pathlib
+import feedparser, os, sqlite3, requests, pathlib, datetime
 
 config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-dowloader")
 db_file = os.path.join(config_dir, "podcast-dowloader.sqlite3")
@@ -17,6 +17,9 @@ def dl(config):
             dl_path = config[key]["destination"]
         for entry in rss.entries:
             title = entry["title"]
+            date_prefix = ""
+            if "published" in entry:
+                date_prefix = datetime.datetime.strptime(entry["published"], "%a, %d %b %Y %H:%M:%S %z").strftime("%Y%m%d_%H%M%S - ")
             for link in entry["links"]:
                 if link["type"][0:5].lower() != "text/":
                     href = link["href"]
@@ -32,7 +35,7 @@ def dl(config):
                     curs.execute("SELECT count(*) FROM downloaded WHERE uuid = ? AND url = ?", (key, href))
 
                     if curs.fetchone()[0] == 0 and do_download == True:
-                        file_dest = os.path.join(dl_path, format_filename(title) + pathlib.Path(href).suffix)
+                        file_dest = os.path.join(dl_path, date_prefix + format_filename(title) + pathlib.Path(href).suffix)
                         file_content = requests.get(href)
                         os.makedirs(dl_path, exist_ok=True)
                         print("Downloading: " + file_dest)
