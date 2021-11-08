@@ -1,7 +1,7 @@
 #!/bin/env python3
 
 #from urllib import request
-import feedparser, os, sqlite3, requests, pathlib, datetime
+import feedparser, os, sqlite3, requests, pathlib, datefinder
 
 config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-dowloader")
 db_file = os.path.join(config_dir, "podcast-dowloader.sqlite3")
@@ -19,7 +19,9 @@ def dl(config):
             title = entry["title"]
             date_prefix = ""
             if "published" in entry:
-                date_prefix = datetime.datetime.strptime(entry["published"], "%a, %d %b %Y %H:%M:%S %z").strftime("%Y%m%d_%H%M%S - ")
+                date_list = datefinder.find_dates(entry["published"])
+                for cur_date in date_list:
+                    date_prefix = cur_date.strftime("%Y%m%d_%H%M%S - ")
             for link in entry["links"]:
                 if link["type"][0:5].lower() != "text/":
                     href = link["href"]
