@@ -49,10 +49,16 @@ elif sys.argv[1].lower() == "delete":
 elif sys.argv[1].lower() == "edit":
     pcd.edit.edit(config)
 elif sys.argv[1].lower() == "list":
-    for key in config:
-        print(key + ": " + config[key]["name"])
+    if argc == 3 and sys.argv[2].lower() == "help":
+        print ("Usage: " + exe_name + " list")
+    else:
+        for key in config:
+            print(key + ": " + config[key]["name"])
 elif sys.argv[1].lower() == "dump-config":
-    print (config)
+    if argc == 3 and sys.argv[2].lower() == "help":
+        print ("Usage: " + exe_name + " dump-config")
+    else:
+        print (config)
 else:
     main_usage()
     if sys.argv[1].lower() == "help":
