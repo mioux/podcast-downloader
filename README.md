@@ -25,6 +25,29 @@ Add as many podcasts as you want.
 
 Start the downloads by starting the program without arguments. `podcast-downloader`
 
+## Needed dependencies
+
+You need these packages to have this script work. Install it either via your distribution packages or pip:
+
+- requests
+- datefinder
+- validators
+- feedparser
+
+Example for Fedora 35:
+
+    sudo dnf install python3-requests python3-validators python3-feedparser
+    pip install datefinder
+
+Example for Debian 11:
+
+    sudo apt install python3-requests python3-validators python3-feedparser
+    pip install datefinder
+
+All can be installed via pip:
+
+    pip install datefinder requests validators feedparser
+
 ## Help
 
 ### Global help
@@ -66,3 +89,4 @@ Start the downloads by starting the program without arguments. `podcast-download
 ### Dump-conffig help
 
     Usage: podcast-downloader dump-config
+
