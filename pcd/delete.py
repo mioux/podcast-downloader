@@ -21,4 +21,5 @@ def delete(config):
             delete_usage()
         else:
             del config[id]
+            print (id + " deleted successfully")
 
