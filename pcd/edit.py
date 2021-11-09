@@ -36,11 +36,20 @@ def edit(config):
         if edit_uuid == "":
             edit_usage()
         else:
+            changed = False
             if url != "":
                 config[edit_uuid]["url"] = url
+                changed = True
             if name != "":
                 config[edit_uuid]["name"] = name
+                changed = True
             if min_size != "":
                 config[edit_uuid]["min_size"] = int(min_size)
+                changed = True
             if destination != None:
                 config[edit_uuid]["destination"] = destination
+                changed = True
+            if changed == True:
+                print (edit_uuid + " edited successfully")
+            else
+                print (edit_uuid + " : no changes were made")
