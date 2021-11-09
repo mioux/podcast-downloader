@@ -51,5 +51,5 @@ def edit(config):
                 changed = True
             if changed == True:
                 print (edit_uuid + " edited successfully")
-            else
+            else:
                 print (edit_uuid + " : no changes were made")
