@@ -34,3 +34,4 @@ def add(config):
             add_usage()
         else:
             config[add_uuid] = { "url": url, "name": name, "min_size": min_size, "destination": destination }
+            print (add_uuid + " added successfully")
