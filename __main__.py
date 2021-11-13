@@ -58,7 +58,7 @@ elif sys.argv[1].lower() == "dump-config":
     if argc == 3 and sys.argv[2].lower() == "help":
         print ("Usage: " + exe_name + " dump-config")
     else:
-        print (config)
+        print (json.dumps(config, indent=2))
 else:
     main_usage()
     if sys.argv[1].lower() == "help":
