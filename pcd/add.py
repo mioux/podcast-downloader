@@ -9,6 +9,7 @@ def add_usage():
     print ("       --url=<url>            : URL of podcast")
     print ("       --name=<name>          : Friendly name")
     print ("       --min-size=<size-in-MB>: Don't download file if size is less than this")
+    print ("       --max-size=<size-in-MB>: Don't download file if size is more than this")
     print ("       --destination=<folder> : Destination folder")
 
 def add(config):
@@ -18,6 +19,7 @@ def add(config):
         url = ""
         name = ""
         min_size = 0
+        max_size = 0
         add_uuid = str(uuid.uuid4())
         destination = ""
         for i in range(2, argc):
@@ -27,11 +29,14 @@ def add(config):
                 name = sys.argv[i][7:]
             if sys.argv[i][0:11] == "--min-size=":
                 min_size = int(sys.argv[i][11:])
+            if sys.argv[i][0:11] == "--max-size=":
+                max_size = int(sys.argv[i][11:])
             if sys.argv[i][0:14] == "--destination=":
                 destination = sys.argv[i][14:]
 
         if url == "" or name == "":
             add_usage()
         else:
-            config[add_uuid] = { "url": url, "name": name, "min_size": min_size, "destination": destination }
+            config[add_uuid] = { "url": url, "name": name, "min_size": min_size, "destination": destination, "max_size": max_size }
             print (add_uuid + " added successfully")
+

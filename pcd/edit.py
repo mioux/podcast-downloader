@@ -10,6 +10,7 @@ def edit_usage():
     print ("       --url=<url>            : New URL of podcast")
     print ("       --name=<name>          : New friendly name")
     print ("       --min-size=<size-in-MB>: New minimum size")
+    print ("       --max-size=<size-in-MB>: New maximum size")
     print ("       --destination=<folder> : Destination folder")
 
 def edit(config):
@@ -19,6 +20,7 @@ def edit(config):
         url = ""
         name = ""
         min_size = ""
+        max_size = ""
         edit_uuid = ""
         destination = None
         for i in range(2, argc):
@@ -30,6 +32,8 @@ def edit(config):
                 name = sys.argv[i][7:]
             if sys.argv[i][0:11] == "--min-size=":
                 min_size = int(sys.argv[i][11:])
+            if sys.argv[i][0:11] == "--max-size=":
+                max_size = int(sys.argv[i][11:])
             if sys.argv[i][0:14] == "--destination=":
                 destination = sys.argv[i][14:]
 
@@ -45,6 +49,9 @@ def edit(config):
                 changed = True
             if min_size != "":
                 config[edit_uuid]["min_size"] = int(min_size)
+                changed = True
+            if max_size != "":
+                config[edit_uuid]["max_size"] = int(max_size)
                 changed = True
             if destination != None:
                 config[edit_uuid]["destination"] = destination

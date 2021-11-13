@@ -11,10 +11,17 @@ def format_filename(filename):
 
 def dl(config):
     for key in config:
-        rss = feedparser.parse(config[key]["url"])
-        dl_path = os.path.join(config_dir, format_filename(config[key]["name"]))
-        if config[key]["destination"] != "":
-            dl_path = config[key]["destination"]
+        url = config[key].get("url", "")
+        name = config[key].get("name", "")
+        min_size = config[key].get("min_size", 0)
+        destination = config[key].get("destination", "")
+        max_size = config[key].get("max_size", 0)
+
+        if destination == "":
+            destination = os.path.join(config_dir, format_filename(config[key]["name"]))
+
+        rss = feedparser.parse(url)
+        
         for entry in rss.entries:
             title = entry["title"]
             date_prefix = ""
@@ -29,7 +36,7 @@ def dl(config):
                     do_download = True
                     if "length" in link:
                         length = float(link["length"]) / 1024 / 1024
-                        if length < config[key]["min_size"]:
+                        if length < min_size or (length > max_size and max_size != 0):
                             do_download = False
 
                     con = sqlite3.connect(db_file)
@@ -37,10 +44,10 @@ def dl(config):
                     curs.execute("SELECT count(*) FROM downloaded WHERE uuid = ? AND url = ?", (key, href))
 
                     if curs.fetchone()[0] == 0 and do_download == True:
-                        file_dest = os.path.join(dl_path, date_prefix + format_filename(title) + pathlib.Path(href).suffix)
+                        file_dest = os.path.join(destination, date_prefix + format_filename(title) + pathlib.Path(href).suffix)
                         print("Downloading: " + file_dest)
                         file_content = requests.get(href)
-                        os.makedirs(dl_path, exist_ok=True)
+                        os.makedirs(destination, exist_ok=True)
                         with open(file_dest, 'wb') as fd:
                             fd.write(file_content.content)
                         

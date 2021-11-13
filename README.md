@@ -67,15 +67,19 @@ All can be installed via pip:
         --url=<url>            : URL of podcast
         --name=<name>          : Friendly name
         --min-size=<size-in-MB>: Don't download file if size is less than this
+        --max-size=<size-in-MB>: Don't download file if size is more than this
         --destination=<folder> : Destination folder
 
 ### Edit help
 
     Usage: podcast-downloader add --url=<url> --name=<name> [--min-size=<size-in-MB>] [--destination=<folder>]
-        --url=<url>            : URL of podcast
-        --name=<name>          : Friendly name
-        --min-size=<size-in-MB>: Don't download file if size is less than this
+        --id=<uuid>            : ID of podcast to edit
+        --url=<url>            : New URL of podcast
+        --name=<name>          : New friendly name
+        --min-size=<size-in-MB>: New minimum size
+        --max-size=<size-in-MB>: New maximum size
         --destination=<folder> : Destination folder
+
 
 ### Delete help
 
