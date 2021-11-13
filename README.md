@@ -80,7 +80,6 @@ All can be installed via pip:
         --max-size=<size-in-MB>: New maximum size
         --destination=<folder> : Destination folder
 
-
 ### Delete help
 
     Usage: podcast-downloader delete --id=<uuid>
@@ -93,4 +92,3 @@ All can be installed via pip:
 ### Dump-conffig help
 
     Usage: podcast-downloader dump-config
-
