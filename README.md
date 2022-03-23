@@ -15,6 +15,7 @@ This command will create your config file like this (on a single line)
             'url': 'http://example.com/rss.xml',
             'name': 'My awesome podcast',
             'min_size': 0,
+            'max_size': 0,
             'destination': ''
         }
     }
