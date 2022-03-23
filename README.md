@@ -72,7 +72,7 @@ All can be installed via pip:
 
 ### Edit help
 
-    Usage: podcast-downloader add --url=<url> --name=<name> [--min-size=<size-in-MB>] [--destination=<folder>]
+    Usage: podcast-downloader edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--max-size=<size-in-MB>] [--destination=<folder>]
         --id=<uuid>            : ID of podcast to edit
         --url=<url>            : New URL of podcast
         --name=<name>          : New friendly name
