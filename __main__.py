@@ -3,9 +3,9 @@
 from genericpath import exists
 import os, json, sqlite3, sys, pcd
 
-config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-dowloader")
-config_file = os.path.join(config_dir, "podcast-dowloader.cfg")
-db_file = os.path.join(config_dir, "podcast-dowloader.sqlite3")
+config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-downloader")
+config_file = os.path.join(config_dir, "podcast-downloader.cfg")
+db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
 
 exe_name = os.path.basename(sys.argv[0])
 
