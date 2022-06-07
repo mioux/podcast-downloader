@@ -90,6 +90,6 @@ All can be installed via pip:
 
     Usage: podcast-downloader list
 
-### Dump-conffig help
+### Dump-config help
 
     Usage: podcast-downloader dump-config
