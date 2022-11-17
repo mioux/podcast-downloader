@@ -1,7 +1,7 @@
 #!/bin/env python3
 
 #from urllib import request
-import feedparser, os, sqlite3, requests, pathlib, datefinder
+import feedparser, os, sqlite3, requests, pathlib, datefinder, datetime, time
 
 config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-downloader")
 db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
@@ -22,8 +22,10 @@ def dl(config):
         url = config[key].get("url", "")
         name = config[key].get("name", "")
         min_size = config[key].get("min_size", 0)
-        destination = config[key].get("destination", "")
         max_size = config[key].get("max_size", 0)
+        destination = config[key].get("destination", "")
+        min_duration = config[key].get("min_duration", 0)
+        max_duration = config[key].get("max_duration", 0)
 
         if destination == "":
             destination = os.path.join(config_dir, format_filename(config[key]["name"]))
@@ -32,16 +34,27 @@ def dl(config):
 
         for entry in rss.entries:
             title = entry["title"]
+
+            do_download = True
+
             date_prefix = ""
             if "published" in entry:
                 date_list = datefinder.find_dates(entry["published"])
                 for cur_date in date_list:
                     date_prefix = cur_date.strftime("%Y%m%d_%H%M%S - ")
+
+            duration = 0
+            if "itunes_duration" in entry:
+                timestr = entry["itunes_duration"]
+                ftr = [3600,60,1]
+                duration = sum([a*b for a,b in zip(ftr, map(int,timestr.split(':')))])
+                if duration < min_duration or (duration > max_duration and max_duration != 0):
+                    do_download = False
+
             for link in entry["links"]:
                 if link["type"][0:5].lower() != "text/":
                     href = link["href"]
 
-                    do_download = True
                     if "length" in link:
                         length = float(link["length"]) / 1024 / 1024
                         if length < min_size or (length > max_size and max_size != 0):

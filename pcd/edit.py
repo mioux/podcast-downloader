@@ -5,13 +5,15 @@ argc = len(sys.argv)
 exe_name = os.path.basename(sys.argv[0])
 
 def edit_usage():
-    print ("Usage: " + exe_name + " edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>]")
-    print ("       --id=<uuid>            : ID of podcast to edit")
-    print ("       --url=<url>            : New URL of podcast")
-    print ("       --name=<name>          : New friendly name")
-    print ("       --min-size=<size-in-MB>: New minimum size")
-    print ("       --max-size=<size-in-MB>: New maximum size")
-    print ("       --destination=<folder> : Destination folder")
+    print ("Usage: " + exe_name + " edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>]")
+    print ("       --id=<uuid>                         : ID of podcast to edit")
+    print ("       --url=<url>                         : New URL of podcast")
+    print ("       --name=<name>                       : New friendly name")
+    print ("       --min-size=<size-in-MB>             : New minimum size")
+    print ("       --max-size=<size-in-MB>             : New maximum size")
+    print ("       --min-duration=<duration-in-seconds>: Don't download file if duration is shorter than this")
+    print ("       --max-duration=<duration-in-seconds>: Don't download file if duration is longer than this")
+    print ("       --destination=<folder>              : Destination folder")
 
 def edit(config):
     if argc == 2 or sys.argv[2].lower() == "help":
@@ -21,6 +23,8 @@ def edit(config):
         name = ""
         min_size = ""
         max_size = ""
+        min_duration = ""
+        max_duration = ""
         edit_uuid = ""
         destination = None
         for i in range(2, argc):
@@ -36,6 +40,10 @@ def edit(config):
                 max_size = int(sys.argv[i][11:])
             if sys.argv[i][0:14] == "--destination=":
                 destination = sys.argv[i][14:]
+            if sys.argv[i][0:15] == "--min-duration=":
+                min_duration = sys.argv[i][15:]
+            if sys.argv[i][0:15] == "--max-duration=":
+                max_duration = sys.argv[i][15:]
 
         if edit_uuid == "":
             edit_usage()
@@ -52,6 +60,12 @@ def edit(config):
                 changed = True
             if max_size != "":
                 config[edit_uuid]["max_size"] = int(max_size)
+                changed = True
+            if min_duration != "":
+                config[edit_uuid]["min_duration"] = int(min_duration)
+                changed = True
+            if max_duration != "":
+                config[edit_uuid]["max_duration"] = int(max_duration)
                 changed = True
             if destination != None:
                 config[edit_uuid]["destination"] = destination
