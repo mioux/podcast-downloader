@@ -16,6 +16,8 @@ This command will create your config file like this (on a single line)
             'name': 'My awesome podcast',
             'min_size': 0,
             'max_size': 0,
+            'min_duration': 0,
+            'max_duration': 0,
             'destination': ''
         }
     }
@@ -64,22 +66,26 @@ All can be installed via pip:
 
 ### Add help
 
-    Usage: podcast-downloader add --url=<url> --name=<name> [--min-size=<size-in-MB>] [--destination=<folder>]
-        --url=<url>            : URL of podcast
-        --name=<name>          : Friendly name
-        --min-size=<size-in-MB>: Don't download file if size is less than this
-        --max-size=<size-in-MB>: Don't download file if size is more than this
-        --destination=<folder> : Destination folder
+    Usage: podcast-downloader.zip add --url=<url> --name=<name> [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>]
+        --url=<url>                         : URL of podcast
+        --name=<name>                       : Friendly name
+        --min-size=<size-in-MB>             : Don't download file if size is less than this
+        --max-size=<size-in-MB>             : Don't download file if size is more than this
+        --min-duration=<duration-in-seconds>: Don't download file if duration is shorter than this
+        --max-duration=<duration-in-seconds>: Don't download file if duration is longer than this
+        --destination=<folder>              : Destination folder
 
 ### Edit help
 
-    Usage: podcast-downloader edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--max-size=<size-in-MB>] [--destination=<folder>]
-        --id=<uuid>            : ID of podcast to edit
-        --url=<url>            : New URL of podcast
-        --name=<name>          : New friendly name
-        --min-size=<size-in-MB>: New minimum size
-        --max-size=<size-in-MB>: New maximum size
-        --destination=<folder> : Destination folder
+    Usage: podcast-downloader.zip edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>]
+        --id=<uuid>                         : ID of podcast to edit
+        --url=<url>                         : New URL of podcast
+        --name=<name>                       : New friendly name
+        --min-size=<size-in-MB>             : New minimum size
+        --max-size=<size-in-MB>             : New maximum size
+        --min-duration=<duration-in-seconds>: Don't download file if duration is shorter than this
+        --max-duration=<duration-in-seconds>: Don't download file if duration is longer than this
+        --destination=<folder>              : Destination folde
 
 ### Delete help
 
