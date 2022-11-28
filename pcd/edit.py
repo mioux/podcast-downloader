@@ -5,15 +5,17 @@ argc = len(sys.argv)
 exe_name = os.path.basename(sys.argv[0])
 
 def edit_usage():
-    print ("Usage: " + exe_name + " edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>]")
-    print ("       --id=<uuid>                         : ID of podcast to edit")
-    print ("       --url=<url>                         : New URL of podcast")
-    print ("       --name=<name>                       : New friendly name")
-    print ("       --min-size=<size-in-MB>             : New minimum size")
-    print ("       --max-size=<size-in-MB>             : New maximum size")
-    print ("       --min-duration=<duration-in-seconds>: Don't download file if duration is shorter than this")
-    print ("       --max-duration=<duration-in-seconds>: Don't download file if duration is longer than this")
-    print ("       --destination=<folder>              : Destination folder")
+    print ("Usage: " + exe_name + " edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>] [--published-time-before=<time-in-HHMMSS>] [--published-time-after=<time-in-HHMMSS>]")
+    print ("       --id=<uuid>                             : ID of podcast to edit")
+    print ("       --url=<url>                             : URL of podcast")
+    print ("       --name=<name>                           : Friendly name")
+    print ("       --min-size=<size-in-MB>                 : Don't download file if size is less than this")
+    print ("       --max-size=<size-in-MB>                 : Don't download file if size is more than this")
+    print ("       --min-duration=<duration-in-seconds>    : Don't download file if duration is shorter than this")
+    print ("       --max-duration=<duration-in-seconds>    : Don't download file if duration is longer than this")
+    print ("       --published-time-before=<time-in-HHMMSS>: Download file if publication time is before time (Format is 24 hour \"HHMMSS\" only.)")
+    print ("       --published-time-after=<time-in-HHMMSS> : Download file if publication time is after time (Format is 24 hour \"HHMMSS\" only.)")
+    print ("       --destination=<folder>                  : Destination folder")
 
 def edit(config):
     if argc == 2 or sys.argv[2].lower() == "help":
@@ -25,6 +27,8 @@ def edit(config):
         max_size = ""
         min_duration = ""
         max_duration = ""
+        published_time_before = ""
+        published_time_after = ""
         edit_uuid = ""
         destination = None
         for i in range(2, argc):
@@ -44,6 +48,18 @@ def edit(config):
                 min_duration = sys.argv[i][15:]
             if sys.argv[i][0:15] == "--max-duration=":
                 max_duration = sys.argv[i][15:]
+            if sys.argv[i][0:24] == "--published-time-before=":
+                published_time_before = int(sys.argv[i][24:])
+                if published_time_before > 240000:
+                    published_time_before = 240000
+                if published_time_before < 0:
+                    published_time_before = 0
+            if sys.argv[i][0:23] == "--published-time-after=":
+                published_time_after = int(sys.argv[i][23:])
+                if published_time_after > 240000:
+                    published_time_after = 240000
+                if published_time_after < 0:
+                    published_time_after = 0
 
         if edit_uuid == "":
             edit_usage()
@@ -66,6 +82,12 @@ def edit(config):
                 changed = True
             if max_duration != "":
                 config[edit_uuid]["max_duration"] = int(max_duration)
+                changed = True
+            if published_time_before != "":
+                config[edit_uuid]["published_time_before"] = int(published_time_before)
+                changed = True
+            if published_time_after != "":
+                config[edit_uuid]["published_time_after"] = int(published_time_after)
                 changed = True
             if destination != None:
                 config[edit_uuid]["destination"] = destination

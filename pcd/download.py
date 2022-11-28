@@ -26,6 +26,8 @@ def dl(config):
         destination = config[key].get("destination", "")
         min_duration = config[key].get("min_duration", 0)
         max_duration = config[key].get("max_duration", 0)
+        published_time_before = config[key].get("published_time_before", 240000)
+        published_time_after = config[key].get("published_time_after", 0) # 000000
 
         if destination == "":
             destination = os.path.join(config_dir, format_filename(config[key]["name"]))
@@ -42,6 +44,10 @@ def dl(config):
                 date_list = datefinder.find_dates(entry["published"])
                 for cur_date in date_list:
                     date_prefix = cur_date.strftime("%Y%m%d_%H%M%S - ")
+
+                published_time = int(cur_date.strftime("%H%M%S"))
+                if published_time > published_time_before or published_time < published_time_after:
+                    do_download = False
 
             duration = 0
             if "itunes_duration" in entry:
