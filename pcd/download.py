@@ -18,6 +18,8 @@ def format_filename(filename):
     return filename.replace("/", "_").replace(":", "_").replace("\\", "_").replace("*", "_").replace("?", "_").replace("\"", "''")
 
 def dl(config):
+    print("Start downloading process")
+
     for key in config:
         url = config[key].get("url", "")
         name = config[key].get("name", "")
@@ -81,3 +83,5 @@ def dl(config):
 
                         curs.execute("INSERT INTO downloaded (uuid, url) VALUES (?, ?)", (key, href))
                         con.commit()
+
+    print("Downloading done")
