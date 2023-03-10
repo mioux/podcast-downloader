@@ -17,22 +17,30 @@ def get_extension(path):
 def format_filename(filename):
     return filename.replace("/", "_").replace(":", "_").replace("\\", "_").replace("*", "_").replace("?", "_").replace("\"", "''")
 
-def dl(config):
+def dl(self):
     print("Start downloading process")
 
-    for key in config:
-        url = config[key].get("url", "")
-        name = config[key].get("name", "")
-        min_size = config[key].get("min_size", 0)
-        max_size = config[key].get("max_size", 0)
-        destination = config[key].get("destination", "")
-        min_duration = config[key].get("min_duration", 0)
-        max_duration = config[key].get("max_duration", 0)
-        published_time_before = config[key].get("published_time_before", 240000)
-        published_time_after = config[key].get("published_time_after", 0) # 000000
+    con = sqlite3.connect(self.db_file)
+    curs = con.cursor()
+
+    curs.execute("SELECT uuid, url, name, min_size, max_size, destination, min_duration, max_duration, published_time_before, published_time_after FROM podcast WHERE enabled = 1")
+
+    data = curs.fetchall()
+
+    for line in data:
+        uuid = "" if line[0] is None else line[0]
+        url = "" if line[1] is None else line[1]
+        name = "" if line[2] is None else line[2]
+        min_size = 0 if line[3] is None else line[3]
+        max_size = 0 if line[4] is None else line[4]
+        destination = "" if line[5] is None else line[5]
+        min_duration = 0 if line[6] is None else line[6]
+        max_duration = 0 if line[7] is None else line[7]
+        published_time_before = 240000 if line[8] is None else line[8]
+        published_time_after = 0 if line[9] is None else line[9] # 000000
 
         if destination == "":
-            destination = os.path.join(config_dir, format_filename(config[key]["name"]))
+            destination = os.path.join(config_dir, format_filename(name))
 
         rss = feedparser.parse(url)
 
@@ -70,7 +78,7 @@ def dl(config):
 
                     con = sqlite3.connect(db_file)
                     curs = con.cursor()
-                    curs.execute("SELECT count(*) FROM downloaded WHERE uuid = ? AND url = ?", (key, href))
+                    curs.execute("SELECT count(*) FROM downloaded WHERE uuid = ? AND url = ?", (uuid, href))
 
                     if curs.fetchone()[0] == 0 and do_download == True:
                         file_extension = get_extension(href)
@@ -81,7 +89,7 @@ def dl(config):
                         with open(file_dest, 'wb') as fd:
                             fd.write(file_content.content)
 
-                        curs.execute("INSERT INTO downloaded (uuid, url) VALUES (?, ?)", (key, href))
+                        curs.execute("INSERT INTO downloaded (uuid, url) VALUES (?, ?)", (uuid, href))
                         con.commit()
 
     print("Downloading done")
