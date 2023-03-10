@@ -77,7 +77,7 @@ All can be installed via pip:
 
 ### Edit help
 
-    Usage: podcast-downloader.zip edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>]
+    Usage: podcast-downloader.zip edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>] [--enabled=<enabled>]
         --id=<uuid>                             : ID of podcast to edit
         --url=<url>                             : URL of podcast
         --name=<name>                           : Friendly name
