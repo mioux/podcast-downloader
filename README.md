@@ -56,7 +56,7 @@ All --id= paramteres can be either "id" or "uuid". UUID may disapear sometime. I
 
 ### Add help
 
-    Usage: . add --url=<url> --name=<name> [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>] [--published-time-before=<time-in-HHMMSS>] [--published-time-after=<time-in-HHMMSS>]
+    Usage: podcast-downloader add --url=<url> --name=<name> [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>] [--published-time-before=<time-in-HHMMSS>] [--published-time-after=<time-in-HHMMSS>]
         --url=<url>                             : URL of podcast
         --name=<name>                           : Friendly name
         --min-size=<size-in-MB>                 : Don't download file if size is less than this
@@ -69,7 +69,7 @@ All --id= paramteres can be either "id" or "uuid". UUID may disapear sometime. I
 
 ### Edit help
 
-    Usage: podcast-downloader.zip edit --id=<id|uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>] [--enabled=<enabled>]
+    Usage: podcast-downloader edit --id=<id|uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>] [--enabled=<enabled>]
         --id=<id|uuid>                             : ID of podcast to edit
         --url=<url>                             : URL of podcast
         --name=<name>                           : Friendly name
