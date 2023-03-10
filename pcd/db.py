@@ -44,6 +44,10 @@ def migrate_db(self):
             enabled BIT
           );""")
         
+        # Please, do not add foreign key between id/uuid in podcast and id/uuid in downloaded. If you remove a podcast, the download history is kept.
+        # I may add it later, as the history has no interest but if you want to re-add an existing podcast. As the id/uuid will not be the same on second addition, a manual update will be needed in database file.
+        # If you plan to add it, please don't add it here, create a new version of database and create it as a normal database upgrade process, so existings DB will be correctly updated.
+
         curs.execute("UPDATE config SET configvalue = '2' WHERE configname = 'DB_VERSION';")
     
         con.commit()

@@ -8,19 +8,7 @@ First add a new podcast to follow :
 
     podcast-downloader add --url="http://example.com/rss.xml" --name="My awesome podcast"
 
-This command will create your config file like this (on a single line)
-
-    {
-        '065b203b-2033-4b02-b1b8-831361f4bfac': {
-            'url': 'http://example.com/rss.xml',
-            'name': 'My awesome podcast',
-            'min_size': 0,
-            'max_size': 0,
-            'min_duration': 0,
-            'max_duration': 0,
-            'destination': ''
-        }
-    }
+This command will create your config and database file in ~/.config/podcast-downloader/podcast-downloader.sqlite3. I have removed the `podcast-downloader.cfg` to have only one file to manage. The database has no password, so you can access it with any compatible client.
 
 You can check with `podcast-downloader dump-config`
 
@@ -53,6 +41,8 @@ All can be installed via pip:
 
 ## Help
 
+All --id= paramteres can be either "id" or "uuid". UUID may disapear sometime. It was a "simple" way to create a unique ID for configuration file. Sqlite has an autoincrement which ensure id is unique.
+
 ### Global help
 
     Usage: podcast-downloader <command> [help]
@@ -66,19 +56,21 @@ All can be installed via pip:
 
 ### Add help
 
-    Usage: podcast-downloader.zip add --url=<url> --name=<name> [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>]
-        --url=<url>                         : URL of podcast
-        --name=<name>                       : Friendly name
-        --min-size=<size-in-MB>             : Don't download file if size is less than this
-        --max-size=<size-in-MB>             : Don't download file if size is more than this
-        --min-duration=<duration-in-seconds>: Don't download file if duration is shorter than this
-        --max-duration=<duration-in-seconds>: Don't download file if duration is longer than this
-        --destination=<folder>              : Destination folder
+    Usage: . add --url=<url> --name=<name> [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>] [--published-time-before=<time-in-HHMMSS>] [--published-time-after=<time-in-HHMMSS>]
+        --url=<url>                             : URL of podcast
+        --name=<name>                           : Friendly name
+        --min-size=<size-in-MB>                 : Don't download file if size is less than this
+        --max-size=<size-in-MB>                 : Don't download file if size is more than this
+        --min-duration=<duration-in-seconds>    : Don't download file if duration is shorter than this
+        --max-duration=<duration-in-seconds>    : Don't download file if duration is longer than this
+        --published-time-before=<time-in-HHMMSS>: Download file if publication time is before time (Format is 24 hour "HHMMSS" only.)
+        --published-time-after=<time-in-HHMMSS> : Download file if publication time is after time (Format is 24 hour "HHMMSS" only.)
+        --destination=<folder>     
 
 ### Edit help
 
-    Usage: podcast-downloader.zip edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>] [--enabled=<enabled>]
-        --id=<uuid>                             : ID of podcast to edit
+    Usage: podcast-downloader.zip edit --id=<id|uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>] [--enabled=<enabled>]
+        --id=<id|uuid>                             : ID of podcast to edit
         --url=<url>                             : URL of podcast
         --name=<name>                           : Friendly name
         --min-size=<size-in-MB>                 : Don't download file if size is less than this
@@ -92,8 +84,8 @@ All can be installed via pip:
 
 ### Delete help
 
-    Usage: podcast-downloader delete --id=<uuid>
-        --id=<uuid> : ID of podcast to delete
+    Usage: podcast-downloader delete --id=<id|uuid>
+        --id=<id|uuid> : ID of podcast to delete
 
 ### List help
 
