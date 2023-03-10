@@ -78,14 +78,17 @@ All can be installed via pip:
 ### Edit help
 
     Usage: podcast-downloader.zip edit --id=<uuid> [--url=<url>] [--name=<name>] [--min-size=<size-in-MB>] [--destination=<folder>] [--min-duration=<duration-in-seconds>] [--max-duration=<duration-in-seconds>]
-        --id=<uuid>                         : ID of podcast to edit
-        --url=<url>                         : New URL of podcast
-        --name=<name>                       : New friendly name
-        --min-size=<size-in-MB>             : New minimum size
-        --max-size=<size-in-MB>             : New maximum size
-        --min-duration=<duration-in-seconds>: Don't download file if duration is shorter than this
-        --max-duration=<duration-in-seconds>: Don't download file if duration is longer than this
-        --destination=<folder>              : Destination folde
+        --id=<uuid>                             : ID of podcast to edit
+        --url=<url>                             : URL of podcast
+        --name=<name>                           : Friendly name
+        --min-size=<size-in-MB>                 : Don't download file if size is less than this
+        --max-size=<size-in-MB>                 : Don't download file if size is more than this
+        --min-duration=<duration-in-seconds>    : Don't download file if duration is shorter than this
+        --max-duration=<duration-in-seconds>    : Don't download file if duration is longer than this
+        --published-time-before=<time-in-HHMMSS>: Download file if publication time is before time (Format is 24 hour "HHMMSS" only.)
+        --published-time-after=<time-in-HHMMSS> : Download file if publication time is after time (Format is 24 hour "HHMMSS" only.)
+        --destination=<folder>                  : Destination folder
+        --enabled=<enabled>                     : If value is not 0 or empty, then enable podcast
 
 ### Delete help
 
