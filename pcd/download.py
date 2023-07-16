@@ -39,10 +39,14 @@ def dl(self):
         published_time_before = 240000 if line[8] is None else line[8]
         published_time_after = 0 if line[9] is None else line[9] # 000000
 
+        if published_time_before == 0: published_time_before = 240000
+
         if destination == "":
             destination = os.path.join(config_dir, format_filename(name))
 
         rss = feedparser.parse(url)
+
+        print("Checking {name} ({uuid})".format(name=name, uuid=uuid))
 
         for entry in rss.entries:
             title = entry["title"]
@@ -50,10 +54,12 @@ def dl(self):
             do_download = True
 
             date_prefix = ""
+            date_published = datetime.datetime.now()
             if "published" in entry:
                 date_list = datefinder.find_dates(entry["published"])
                 for cur_date in date_list:
                     date_prefix = cur_date.strftime("%Y%m%d_%H%M%S - ")
+                    date_published = cur_date
 
                 published_time = int(cur_date.strftime("%H%M%S"))
                 if published_time > published_time_before or published_time < published_time_after:
@@ -66,6 +72,10 @@ def dl(self):
                 duration = sum([a*b for a,b in zip(ftr, map(int,timestr.split(':')))])
                 if duration < min_duration or (duration > max_duration and max_duration != 0):
                     do_download = False
+
+            description = ""
+            if "itunes_duration" in entry:
+                description = entry["description"]
 
             for link in entry["links"]:
                 if link["type"][0:5].lower() != "text/":
@@ -89,7 +99,7 @@ def dl(self):
                         with open(file_dest, 'wb') as fd:
                             fd.write(file_content.content)
 
-                        curs.execute("INSERT INTO downloaded (uuid, url) VALUES (?, ?)", (uuid, href))
+                        curs.execute("INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description) VALUES (?, ?, ?, current_timestamp, ?, ?)", (uuid, href, title, date_published, description))
                         con.commit()
 
     print("Downloading done")

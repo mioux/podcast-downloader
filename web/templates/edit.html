@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}podcast-downloader web interface - EDIT{% endblock %}
+
+{% block inpagetitle %}{% if is_new == 1 %}Add{% else %}Edit{% endif %}{% endblock %}
+
+{% block content %}
+    <div>
+        {% if is_new == 1 or found == 1 %}
+        <form method="post">
+            <table>
+                <tr>
+                    <td>ID</td>
+                    <td><input type="text" name="id" value="{{ edit_id }}" readonly></td>
+                </tr>
+                <tr>
+                    <td>Name</td>
+                    <td><input type="text" name="name" placeholder="Name of the current podcast" value="{{ podcast["name"] }}"></input></td>
+                </tr>
+                <tr>
+                    <td>URL</td>
+                    <td><input type="text" name="url" placeholder="URL of the current podcast" value="{{ podcast["url"] }}"></input></td>
+                </tr>
+                <tr>
+                    <td>Minimal size</td>
+                    <td><input type="number" name="min_size" placeholder="Minimal size of the file to be downloaded (empty for none, in MB)" value="{{ podcast["min_size"] }}"></input></td>
+                </tr>
+                <tr>
+                    <td>Maximal size</td>
+                    <td><input type="number" name="max_size" placeholder="Maximal size of the file to be downloaded (empty for none, in MB)" value="{{ podcast["max_size"] }}"></input></td>
+                </tr>
+                <tr>
+                    <td>Minimal duration</td>
+                    <td><input type="number" name="min_duration" placeholder="Minimal duration of the podcast (empty for none, in seconds)" value="{{ podcast["min_duration"] }}"></input></td>
+                </tr>
+                <tr>
+                    <td>Maximal duration</td>
+                    <td><input type="number" name="max_duration" placeholder="Maximal duration of the podcast (empty for none, in seconds)" value="{{ podcast["max_duration"] }}"></input></td>
+                </tr>
+                <tr>
+                    <td>Published time before </td>
+                    <td><input type="time" step="1" name="published_time_before" placeholder="Podcast must have been published before this time in the day (empty for none, format : HH:MM:SS with 24 format hour)" value="{{ published_time_before_time }}"></input></td>
+                </tr>
+                <tr>
+                    <td>Published time after</td>
+                    <td><input type="time" step="1" name="published_time_after" placeholder="Podcast must have been published after this time in the day (empty for none, format : HH:MM:SS with 24 format hour)" value="{{ published_time_after_time }}"></input></td>
+                </tr>
+                <tr>
+                    <td>Destination</td>
+                    <td><input type="text" name="destination" placeholder="Destination folder" value="{{ podcast["destination"] }}"></input></td>
+                </tr>
+                <tr>
+                    <td><label for="check_enabled">Enabled</label></td>
+                    <td><input name="enabled" type="checkbox" {% if podcast["enabled"] == 1 or is_new == 1 %}checked{% endif %} /></td>
+                </tr>
+            </table>
+            <input type="submit" value="Save">
+        </form>
+        {% else %}
+            <span>UUID is invalid</span>
+        {% endif %}
+    </div>
+{% endblock %}

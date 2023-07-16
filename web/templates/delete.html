@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}podcast-downloader web interface - DELETE{% endblock %}
+
+{% block inpagetitle %}Are you sure you want to delete {{ name }}?{% endblock %}
+
+{% block content %}
+    <div>
+        <form method="POST">
+            <input type="hidden" name="delete_id" value="{{ delete_id }}">
+            <input type="submit">
+            <a href="{{ url_for('list') }}">NO! Take me to the podcast list instead!</a>
+        </form>
+    </div>
+{% endblock %}

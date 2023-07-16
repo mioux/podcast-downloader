@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}podcast-downloader web interface{% endblock %}
+
+{% block inpagetitle %}Podcast list{% endblock %}
+
+{% block content %}
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>URL</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for podcast in podcast_list %}
+                    <tr>
+                        <td>{{ podcast["id"] }}</td>
+                        <td>{{ podcast["name"] }}</td>
+                        <td>{{ podcast["url"] }}</td>
+                        <td><a href="{{ url_for('edit', edit_id=podcast["id"]) }}">Edit</a></td>
+                        <td><a href="{{ url_for('delete', delete_id=podcast["id"]) }}">Delete</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
