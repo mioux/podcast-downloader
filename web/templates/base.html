@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <title>{% block title %} {% endblock %}</title>
+  </head>
+  <body>
+    <div>
+      <h1>{% block inpagetitle %} {% endblock %}</h1>
+    </div>
+    <div>
+      <a href="{{ url_for('list') }}">Podcast list</a>
+      <a href="{{ url_for('edit', edit_id='new') }}">Add new podcast</a>
+      <a href="{{ url_for('history') }}">View download history</a>
+      <a href="{{ url_for('download') }}">Force download</a>
+    </div>
+    <div class="container">
+        {% block content %} {% endblock %}
+    </div>
+  </body>
+</html>

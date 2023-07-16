@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}podcast-downloader web interface - EDIT{% endblock %}
+
+{% block inpagetitle %}History{% endblock %}
+
+{% block content %}
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Podcast</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Published</th>
+                    <th>Downloaded</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in history %}
+                    <tr>
+                        <td>{{ h["podcast_name"] }}</td>
+                        <td><a href="{{ h["url"] }}">{{ h["name"] }}</a></td>
+                        <td>{{ h["description"] }}</td>
+                        <td>{{ h["publish_time"] }}</td>
+                        <td>{{ h["dl_time"] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -43,13 +43,13 @@ def migrate_db(self):
             published_time_after INT,
             enabled BIT
           );""")
-        
+
         # Please, do not add foreign key between id/uuid in podcast and id/uuid in downloaded. If you remove a podcast, the download history is kept.
         # I may add it later, as the history has no interest but if you want to re-add an existing podcast. As the id/uuid will not be the same on second addition, a manual update will be needed in database file.
         # If you plan to add it, please don't add it here, create a new version of database and create it as a normal database upgrade process, so existings DB will be correctly updated.
 
         curs.execute("UPDATE config SET configvalue = '2' WHERE configname = 'DB_VERSION';")
-    
+
         con.commit()
 
         if exists(self.config_file):
@@ -80,6 +80,16 @@ def migrate_db(self):
             self.add(url = url, name = name, min_size = min_size, max_size = max_size, destination = destination, min_duration = min_duration, max_duration = max_duration, published_time_before = published_time_before, published_time_after = published_time_after, add_uuid = key)
             version = '2'
 
+    if version == '2':
+        curs.execute("ALTER TABLE downloaded ADD name VARCHAR(1024)")
+        curs.execute("ALTER TABLE downloaded ADD description TEXT")
+        curs.execute("ALTER TABLE downloaded ADD dl_time DATETIME")
+        curs.execute("ALTER TABLE downloaded ADD publish_time DATETIME")
+        curs.execute("UPDATE downloaded SET name = '', dl_time = current_timestamp, publish_time = current_timestamp")
+        curs.execute("UPDATE config SET configvalue = '3' WHERE configname = 'DB_VERSION';")
+        con.commit()
+        version = '3'
+
     con.close()
 
 def get_data(db_file, query):
@@ -100,4 +110,37 @@ def podcast_list(self):
 
 def config_dump(self):
     return get_data(self.db_file, "SELECT * FROM podcast")
-    
+
+def web_list(self):
+    return get_data(self.db_file, "SELECT id, name, url FROM podcast")
+
+def web_history(self):
+    return get_data(self.db_file, """
+        SELECT p.name AS podcast_name,
+               h.url,
+               CASE h.name WHEN '' THEN h.url ELSE h.name END AS name,
+               h.publish_time,
+               h.dl_time,
+               h.description
+        FROM podcast p INNER JOIN
+             downloaded h ON h.uuid = p.uuid
+        ORDER BY p.uuid, h.publish_time, h.dl_time, h.id""")
+
+def web_podcast_detail(self, id):
+    con = sqlite3.connect(self.db_file)
+    con.row_factory = sqlite3.Row
+    curs = con.cursor()
+
+    curs.execute("SELECT * FROM podcast WHERE id = ?", [(id)])
+
+    row = curs.fetchone()
+
+    data = {}
+    for idx, col in enumerate(curs.description):
+        data[col[0]] = row[idx]
+
+    curs.close()
+    con.commit()
+    con.close()
+
+    return data

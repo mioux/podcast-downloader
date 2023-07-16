@@ -3,6 +3,7 @@
 import os, sys, validators
 from pcd import pcd
 from pprint import pprint
+from web import web
 
 config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-downloader")
 config_file = os.path.join(config_dir, "podcast-downloader.cfg") # Not used, for compatibility with very early version
@@ -20,6 +21,7 @@ def main_usage():
     print ("           delete      : Delete a podcast")
     print ("           list        : List podcast - id: friendly name")
     print ("           dump-config : Display the raw config file")
+    print ("           web         : Starts web server")
     print ("       see 'help' subcommand for more information")
 
 os.makedirs(config_dir, exist_ok=True)
@@ -131,7 +133,7 @@ elif sys.argv[1].lower() == "edit":
             if published_time_after < 0:
                 published_time_after = 0
         if sys.argv[i][0:10] == "--enabled=":
-            enabled = sys.argv[i][10:] != "0" and sys.argv[i][10:] != "" 
+            enabled = sys.argv[i][10:] != "0" and sys.argv[i][10:] != ""
 
     if edit_uuid is None:
         _pcd.edit_usage()
@@ -185,6 +187,26 @@ elif sys.argv[1].lower() == "dump-config":
                 if h != "uuid":
                     js_data[line["uuid"]][h] = line[h]
         pprint(js_data)
+
+elif sys.argv[1].lower() == "web":
+    if argc > 2 and sys.argv[2].lower() == "help":
+        web.web_usage()
+    else:
+        port="8000"
+        listen="127.0.0.1"
+        debug=False
+        for i in range(2, argc):
+            if sys.argv[i][0:7] == "--port=":
+                port = sys.argv[i][7:]
+            if sys.argv[i][0:9] == "--listen=":
+                listen = sys.argv[i][9:]
+            if sys.argv[i][0:8] == "--debug=":
+                debug_str = sys.argv[i][8:]
+                if debug_str == "1" or debug_str.lower() == "on" or debug_str.lower() == "yes" or debug_str.lower() == "true":
+                    debug = True
+
+        web.start_web_werver(port, listen, debug, config_file, db_file)
+
 else:
     main_usage()
     if sys.argv[1].lower() == "help":

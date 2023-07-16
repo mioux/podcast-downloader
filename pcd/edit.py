@@ -18,15 +18,17 @@ def edit_usage(self):
     print ("       --destination=<folder>                  : Destination folder")
     print ("       --enabled=<enabled>                     : If value is not 0 or empty, then enable podcast")
 
-def edit(self, uuid, key, value):
-    if argc == 2 or sys.argv[2].lower() == "help":
-        edit_usage()
-    else:
-        con = sqlite3.connect(self.db_file)
-        curs = con.cursor()
-        curs.execute("UPDATE podcast SET " + key + " = ? WHERE uuid = ? OR id = ?", (value, uuid, uuid))
-        rc = curs.rowcount
-        con.commit()
-        con.close()
+def edit(self, uuid, key, value, flask_update = False):
+    if flask_update == False:
+        if argc == 2 or sys.argv[2].lower() == "help":
+            edit_usage()
+            return 0
 
-        return rc > 0
+    con = sqlite3.connect(self.db_file)
+    curs = con.cursor()
+    curs.execute("UPDATE podcast SET " + key + " = ? WHERE uuid = ? OR id = ?", (value, uuid, uuid))
+    rc = curs.rowcount
+    con.commit()
+    con.close()
+
+    return rc > 0

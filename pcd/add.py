@@ -15,7 +15,7 @@ def add_usage(self):
     print ("       --published-time-after=<time-in-HHMMSS> : Download file if publication time is after time (Format is 24 hour \"HHMMSS\" only.)")
     print ("       --destination=<folder>                  : Destination folder")
 
-def add(self, url = "", name = "", min_size = None, max_size = None, min_duration = None, max_duration = None, published_time_before = None, published_time_after = None, add_uuid = None, destination = None) -> str:
+def add(self, url = "", name = "", min_size = None, max_size = None, min_duration = None, max_duration = None, published_time_before = None, published_time_after = None, add_uuid = None, destination = None, enabled = True) -> str:
 
     if add_uuid is None: add_uuid = str(uuid.uuid4())
 
@@ -26,20 +26,26 @@ def add(self, url = "", name = "", min_size = None, max_size = None, min_duratio
         con = sqlite3.connect(self.db_file)
         curs = con.cursor()
 
+        if enabled == True:
+            enabled = 1
+        else:
+            enabled = 0
+
         curs.execute("""
             INSERT INTO podcast (
-                uuid, name, url, min_size, max_size, 
-                destination, min_duration, max_duration, published_time_before, published_time_after, 
+                uuid, name, url, min_size, max_size,
+                destination, min_duration, max_duration, published_time_before, published_time_after,
                 enabled
             )
             VALUES (
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
-                1)""", (
+                ?)""", (
                     add_uuid, name, url, min_size, max_size,
-                    destination, min_duration, max_duration, published_time_before, published_time_after
+                    destination, min_duration, max_duration, published_time_before, published_time_after,
+                    enabled
                 ))
-    
+
         print (add_uuid + " (" + name + ") added successfully")
 
         con.commit()
