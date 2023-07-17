@@ -1,3 +1,4 @@
+{% set active = 'list' %}
 {% extends 'base.html' %}
 
 {% block title %}podcast-downloader web interface{% endblock %}
@@ -6,24 +7,24 @@
 
 {% block content %}
     <div>
-        <table>
+        <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>URL</th>
-                    <th></th>
-                    <th></th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">URL</th>
+                    <th scope="col">Edit</th>
+                    <th scope="col">Delete</th>
                 </tr>
             </thead>
             <tbody>
                 {% for podcast in podcast_list %}
                     <tr>
-                        <td>{{ podcast["id"] }}</td>
+                        <th scope="row">{{ podcast["id"] }}</td>
                         <td>{{ podcast["name"] }}</td>
-                        <td>{{ podcast["url"] }}</td>
-                        <td><a href="{{ url_for('edit', edit_id=podcast["id"]) }}">Edit</a></td>
-                        <td><a href="{{ url_for('delete', delete_id=podcast["id"]) }}">Delete</a></td>
+                        <td><a href="{{ podcast["url"] }}">{{ podcast["url"] }}</a></td>
+                        <td><a href="{{ url_for('edit', edit_id=podcast["id"]) }}"><i class="bi bi-pencil"></i></a></td>
+                        <td><a href="{{ url_for('delete', delete_id=podcast["id"]) }}"><i class="bi bi-x-octagon-fill" style="color: red;"></i></a></td>
                     </tr>
                 {% endfor %}
             </tbody>

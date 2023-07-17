@@ -1,11 +1,12 @@
+{% set active = 'dl' %}
 {% extends 'base.html' %}
 
 {% block title %}podcast-downloader web interface - DELETE{% endblock %}
 
-{% block inpagetitle %}Are you sure you want to delete {{ name }}?{% endblock %}
+{% block inpagetitle %}Force download{% endblock %}
 
 {% block content %}
-    <div>
-        <p><span>Download complete</span></p>
+    <div class="alert alert-success" role="alert">
+        Download complete
     </div>
 {% endblock %}

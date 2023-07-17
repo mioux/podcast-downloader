@@ -16,6 +16,12 @@ Add as many podcasts as you want.
 
 Start the downloads by starting the program without arguments. `podcast-downloader`
 
+Beware of running web server through `podcast-downloader web` instead of flask, or at least, start `podcast-downloader` without arguments after an upgrade, to ensure database is correctly updated
+
+You can configure the app through the web server. It uses internal python's web server AND MUST NOT BE SET AS WORLDWIDE ACCESSIBLE ! There is no security set, no password protection, and it should easily used to download mallicious files on your computer.
+
+There is a `podcast-downlader-web.bat` and a `podcast-downlader-web.sh` as helper to start web server
+
 ## Needed dependencies
 
 You need these packages to have this script work. Install it either via your distribution packages or pip:
@@ -25,20 +31,22 @@ You need these packages to have this script work. Install it either via your dis
 - validators
 - feedparser
 - Flask
+- regex
+- dateutil
 
 Example for Fedora 35:
 
-    sudo dnf install python3-requests python3-validators python3-feedparser python3-flask
+    sudo dnf install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil
     pip install datefinder
 
 Example for Debian 11:
 
-    sudo apt install python3-requests python3-validators python3-feedparser python3-flask
+    sudo apt install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil
     pip install datefinder
 
 All can be installed via pip:
 
-    pip install datefinder requests validators feedparser Flask
+    pip install datefinder requests validators feedparser Flask regex dateutil
     #or
     pip install -r requirements.txt
 

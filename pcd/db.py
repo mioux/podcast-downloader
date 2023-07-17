@@ -90,6 +90,13 @@ def migrate_db(self):
         con.commit()
         version = '3'
 
+    if version == '3':
+        curs.execute("ALTER TABLE downloaded ADD external_link VARCHAR(1024)")
+        curs.execute("UPDATE downloaded SET external_link = ''")
+        curs.execute("UPDATE config SET configvalue = '4' WHERE configname = 'DB_VERSION';")
+        con.commit()
+        version = '4'
+
     con.close()
 
 def get_data(db_file, query):
@@ -121,7 +128,8 @@ def web_history(self):
                CASE h.name WHEN '' THEN h.url ELSE h.name END AS name,
                h.publish_time,
                h.dl_time,
-               h.description
+               h.description,
+               CASE WHEN h.external_link = '' THEN h.url ELSE h.external_link END AS external_link
         FROM podcast p INNER JOIN
              downloaded h ON h.uuid = p.uuid
         ORDER BY p.uuid, h.publish_time, h.dl_time, h.id""")

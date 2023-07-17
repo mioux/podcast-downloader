@@ -1,3 +1,4 @@
+{% set active = 'history' %}
 {% extends 'base.html' %}
 
 {% block title %}podcast-downloader web interface - EDIT{% endblock %}
@@ -6,24 +7,26 @@
 
 {% block content %}
     <div>
-        <table>
+        <table class="table">
             <thead>
                 <tr>
-                    <th>Podcast</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Published</th>
-                    <th>Downloaded</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Published</th>
+                    <th scope="col">Downloaded</th>
+                    <th scope="col"><i class="bi bi-cloud-download"></i></th>
                 </tr>
             </thead>
             <tbody>
                 {% for h in history %}
                     <tr>
                         <td>{{ h["podcast_name"] }}</td>
-                        <td><a href="{{ h["url"] }}">{{ h["name"] }}</a></td>
+                        <td><a href="{{ h["external_link"] }}">{{ h["name"] }}</a></td>
                         <td>{{ h["description"] }}</td>
                         <td>{{ h["publish_time"] }}</td>
                         <td>{{ h["dl_time"] }}</td>
+                        <td><a href="{{ h["url"] }}"><i class="bi bi-cloud-download"></i></a></td>
                     </tr>
                 {% endfor %}
             </tbody>

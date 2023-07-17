@@ -74,8 +74,12 @@ def dl(self):
                     do_download = False
 
             description = ""
-            if "itunes_duration" in entry:
+            if "description" in entry:
                 description = entry["description"]
+
+            extrenal_link = ""
+            if "link" in entry:
+                extrenal_link = entry["link"]
 
             for link in entry["links"]:
                 if link["type"][0:5].lower() != "text/":
@@ -99,7 +103,7 @@ def dl(self):
                         with open(file_dest, 'wb') as fd:
                             fd.write(file_content.content)
 
-                        curs.execute("INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description) VALUES (?, ?, ?, current_timestamp, ?, ?)", (uuid, href, title, date_published, description))
+                        curs.execute("INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link) VALUES (?, ?, ?, current_timestamp, ?, ?, ?)", (uuid, href, title, date_published, description, extrenal_link))
                         con.commit()
 
     print("Downloading done")
