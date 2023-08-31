@@ -119,7 +119,7 @@ def config_dump(self):
     return get_data(self.db_file, "SELECT * FROM podcast")
 
 def web_list(self):
-    return get_data(self.db_file, "SELECT id, name, url FROM podcast")
+    return get_data(self.db_file, "SELECT id, name, url, enabled FROM podcast")
 
 def web_history(self):
     return get_data(self.db_file, """
