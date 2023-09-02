@@ -77,7 +77,9 @@ def migrate_db(self):
             if published_time_before == 240000 : published_time_before = None
             if published_time_after == 0 : published_time_after = None
 
-            self.add(url = url, name = name, min_size = min_size, max_size = max_size, destination = destination, min_duration = min_duration, max_duration = max_duration, published_time_before = published_time_before, published_time_after = published_time_after, add_uuid = key)
+            self.add(url = url, name = name, min_size = min_size, max_size = max_size, destination = destination,
+                     min_duration = min_duration, max_duration = max_duration, published_time_before = published_time_before, published_time_after = published_time_after,
+                     add_uuid = key)
             version = '2'
 
     if version == '2':
@@ -96,6 +98,13 @@ def migrate_db(self):
         curs.execute("UPDATE config SET configvalue = '4' WHERE configname = 'DB_VERSION';")
         con.commit()
         version = '4'
+
+    if version == '4':
+        curs.execute("ALTER TABLE podcast ADD include VARCHAR(1024)")
+        curs.execute("ALTER TABLE podcast ADD exclude VARCHAR(1024)")
+        curs.execute("UPDATE config SET configvalue = '5' WHERE configname = 'DB_VERSION';")
+        con.commit()
+        version = '5'
 
     con.close()
 

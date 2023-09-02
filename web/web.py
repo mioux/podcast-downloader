@@ -117,6 +117,8 @@ def edit(edit_id):
         published_time_after = data["published_time_after"]
         edit_id = data["id"]
         destination = data["destination"]
+        include = data["include"]
+        exclude = data["exclude"]
         enabled = False
         if "enabled" in data:
             enabled = data["enabled"].lower() == "on"
@@ -145,7 +147,7 @@ def edit(edit_id):
             _pcd.add(url=url, name=name, min_size=min_size,
                      max_size=max_size, min_duration=min_duration, max_duration=max_duration,
                      published_time_before=published_time_before_int, published_time_after=published_time_after_int, destination=destination,
-                     enabled=enabled)
+                     enabled=enabled, include=include, exclude=exclude)
             return redirect("/list", code=302)
         elif valid == True:
             _pcd.edit(uuid=id, key="name", value=name, flask_update=True)
@@ -158,6 +160,8 @@ def edit(edit_id):
             _pcd.edit(uuid=id, key="published_time_after", value=published_time_after_int, flask_update=True)
             _pcd.edit(uuid=id, key="destination", value=destination, flask_update=True)
             _pcd.edit(uuid=id, key="enabled", value=enabled, flask_update=True)
+            _pcd.edit(uuid=id, key="include", value=include, flask_update=True)
+            _pcd.edit(uuid=id, key="exclude", value=exclude, flask_update=True)
             return redirect("/list", code=302)
 
     else:

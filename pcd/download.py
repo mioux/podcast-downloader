@@ -1,7 +1,7 @@
 #!/bin/env python3
 
 #from urllib import request
-import feedparser, os, sqlite3, requests, pathlib, datefinder, datetime, time
+import feedparser, os, sqlite3, requests, pathlib, datefinder, datetime, time, re, sys
 
 config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-downloader")
 db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
@@ -23,7 +23,9 @@ def dl(self):
     con = sqlite3.connect(self.db_file)
     curs = con.cursor()
 
-    curs.execute("SELECT uuid, url, name, min_size, max_size, destination, min_duration, max_duration, published_time_before, published_time_after FROM podcast WHERE enabled = 1")
+    curs.execute("""SELECT uuid, url, name, min_size, max_size,
+                            destination, min_duration, max_duration, published_time_before, published_time_after,
+                            include, exclude FROM podcast WHERE enabled = 1""")
 
     data = curs.fetchall()
 
@@ -38,6 +40,8 @@ def dl(self):
         max_duration = 0 if line[7] is None else line[7]
         published_time_before = 240000 if line[8] is None else line[8]
         published_time_after = 0 if line[9] is None else line[9] # 000000
+        include = "" if line[10] is None else line[10]
+        exclude = "" if line[11] is None else line[11]
 
         if published_time_before == 0: published_time_before = 240000
 
@@ -52,6 +56,29 @@ def dl(self):
             title = entry["title"]
 
             do_download = True
+
+            if include != "":
+                try:
+                    if re.search(include, title, re.IGNORECASE) is None:
+                        do_download = False
+                except Exception as exp:
+                    print("Invalid \"include\" regular expression: ", file=sys.stderr)
+                    if hasattr(exp, "message"):
+                        print(exp.message, file=sys.stderr)
+                    else:
+                        print(exp)
+
+            if exclude != "":
+                try:
+                    if re.search(exclude, title, re.IGNORECASE) is not None:
+                        do_download = False
+                except Exception as exp:
+                    print("Invalid \"include\" regular expression: ", file=sys.stderr)
+                    if hasattr(exp, "message"):
+                        print(exp.message, file=sys.stderr)
+                    else:
+                        print(exp)
+
 
             date_prefix = ""
             date_published = datetime.datetime.now()
@@ -103,7 +130,8 @@ def dl(self):
                         with open(file_dest, 'wb') as fd:
                             fd.write(file_content.content)
 
-                        curs.execute("INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link) VALUES (?, ?, ?, current_timestamp, ?, ?, ?)", (uuid, href, title, date_published, description, extrenal_link))
+                        curs.execute("INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link) VALUES (?, ?, ?, current_timestamp, ?, ?, ?)",
+                                     (uuid, href, title, date_published, description, extrenal_link))
                         con.commit()
 
     print("Downloading done")

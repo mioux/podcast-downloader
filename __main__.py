@@ -47,6 +47,8 @@ if sys.argv[1].lower() == "add":
         max_duration = None
         published_time_after = None
         published_time_before = None
+        include = None
+        exclude = None
 
         for i in range(2, argc):
             if sys.argv[i][0:6] == "--url=" and validators.url(sys.argv[i][6:]) == True:
@@ -75,8 +77,14 @@ if sys.argv[1].lower() == "add":
                     published_time_after = 240000
                 if published_time_after < 0:
                     published_time_after = 0
+            if sys.argv[i][0:10] == "--include=":
+                include = sys.argv[i][10:]
+            if sys.argv[i][0:10] == "--exclude=":
+                exclude = sys.argv[i][10:]
 
-        _pcd.add(url = url, name = name, min_size = min_size, max_size = max_size, destination = destination, min_duration = min_duration, max_duration = max_duration, published_time_before = published_time_before, published_time_after = published_time_after)
+        _pcd.add(url = url, name = name, min_size = min_size, max_size = max_size, destination = destination,
+                 min_duration = min_duration, max_duration = max_duration, published_time_before = published_time_before,
+                 published_time_after = published_time_after, include = include, exclude = exclude)
 
 elif sys.argv[1].lower() == "delete":
     if argc == 2 or sys.argv[2].lower() == "help":
@@ -103,6 +111,9 @@ elif sys.argv[1].lower() == "edit":
     edit_uuid = None
     destination = None
     enabled = None
+    include = None
+    exclude = None
+
     for i in range(2, argc):
         if sys.argv[i][0:5] == "--id=":
             edit_uuid = sys.argv[i][5:]
@@ -134,6 +145,10 @@ elif sys.argv[1].lower() == "edit":
                 published_time_after = 0
         if sys.argv[i][0:10] == "--enabled=":
             enabled = sys.argv[i][10:] != "0" and sys.argv[i][10:] != ""
+        if sys.argv[i][0:10] == "--include=":
+            include = sys.argv[i][10:]
+        if sys.argv[i][0:10] == "--exclude=":
+            exclude = sys.argv[i][10:]
 
     if edit_uuid is None:
         _pcd.edit_usage()
@@ -159,6 +174,10 @@ elif sys.argv[1].lower() == "edit":
             changed = _pcd.edit(edit_uuid, "destination", destination) or changed
         if enabled is not None:
             changed = _pcd.edit(edit_uuid, "enabled", enabled) or changed
+        if include is not None:
+            changed = _pcd.edit(edit_uuid, "include", include) or changed
+        if exclude is not None:
+            changed = _pcd.edit(edit_uuid, "exclude", exclude) or changed
 
         if changed == True:
             print (edit_uuid + " edited successfully")

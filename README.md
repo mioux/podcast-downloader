@@ -77,7 +77,9 @@ All --id= paramteres can be either "id" or "uuid". UUID may disapear sometime. I
         --max-duration=<duration-in-seconds>    : Don't download file if duration is longer than this
         --published-time-before=<time-in-HHMMSS>: Download file if publication time is before time (Format is 24 hour "HHMMSS" only.)
         --published-time-after=<time-in-HHMMSS> : Download file if publication time is after time (Format is 24 hour "HHMMSS" only.)
-        --destination=<folder>
+        --destination=<folder>                  : Destination folder
+        --include=<regular expression>          : Include podcasts whose title matches the regular expression. This uses case insensitive search.
+        --exclude=<regular expression>          : Exclude podcasts whose title matches the regular expression. This uses case insensitive search.
 
 ### Edit help
 
@@ -92,6 +94,8 @@ All --id= paramteres can be either "id" or "uuid". UUID may disapear sometime. I
         --published-time-before=<time-in-HHMMSS>: Download file if publication time is before time (Format is 24 hour "HHMMSS" only.)
         --published-time-after=<time-in-HHMMSS> : Download file if publication time is after time (Format is 24 hour "HHMMSS" only.)
         --destination=<folder>                  : Destination folder
+        --include=<regular expression>          : Include podcasts whose title matches the regular expression. This uses case insensitive search.
+        --exclude=<regular expression>          : Exclude podcasts whose title matches the regular expression. This uses case insensitive search.
         --enabled=<enabled>                     : If value is not 0 or empty, then enable podcast
 
 ### Delete help
