@@ -14,8 +14,12 @@ def add_usage(self):
     print ("       --published-time-before=<time-in-HHMMSS>: Download file if publication time is before time (Format is 24 hour \"HHMMSS\" only.)")
     print ("       --published-time-after=<time-in-HHMMSS> : Download file if publication time is after time (Format is 24 hour \"HHMMSS\" only.)")
     print ("       --destination=<folder>                  : Destination folder")
+    print ("       --include=<regular expression>          : Include podcasts whose title matches the regular expression. This uses case insensitive search.")
+    print ("       --exclude=<regular expression>          : Exclude podcasts whose title matches the regular expression. This uses case insensitive search.")
 
-def add(self, url = "", name = "", min_size = None, max_size = None, min_duration = None, max_duration = None, published_time_before = None, published_time_after = None, add_uuid = None, destination = None, enabled = True) -> str:
+def add(self, url = "", name = "", min_size = None, max_size = None,
+        min_duration = None, max_duration = None, published_time_before = None, published_time_after = None, add_uuid = None,
+        destination = None, enabled = True, include = "", exclude = "") -> str:
 
     if add_uuid is None: add_uuid = str(uuid.uuid4())
 
@@ -35,15 +39,15 @@ def add(self, url = "", name = "", min_size = None, max_size = None, min_duratio
             INSERT INTO podcast (
                 uuid, name, url, min_size, max_size,
                 destination, min_duration, max_duration, published_time_before, published_time_after,
-                enabled
+                enabled, include, exclude
             )
             VALUES (
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
-                ?)""", (
+                ?, ?, ?)""", (
                     add_uuid, name, url, min_size, max_size,
                     destination, min_duration, max_duration, published_time_before, published_time_after,
-                    enabled
+                    enabled, include, exclude
                 ))
 
         print (add_uuid + " (" + name + ") added successfully")

@@ -17,6 +17,8 @@ def edit_usage(self):
     print ("       --published-time-after=<time-in-HHMMSS> : Download file if publication time is after time (Format is 24 hour \"HHMMSS\" only.)")
     print ("       --destination=<folder>                  : Destination folder")
     print ("       --enabled=<enabled>                     : If value is not 0 or empty, then enable podcast")
+    print ("       --include=<regular expression>          : Include podcasts whose title matches the regular expression. This uses case insensitive search.")
+    print ("       --exclude=<regular expression>          : Exclude podcasts whose title matches the regular expression. This uses case insensitive search.")
 
 def edit(self, uuid, key, value, flask_update = False):
     if flask_update == False:
