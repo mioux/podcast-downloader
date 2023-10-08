@@ -13,6 +13,26 @@ _pcd = pcd.pcd(config_file=config_file, db_file=db_file)
 
 exe_name = os.path.basename(sys.argv[0])
 
+def stringToIntDays(dayList = "") -> int:
+    check_days = dayList.lower().replace(" ", "").split(",")
+    download_days = 0
+    if "mon" in check_days:
+        download_days = download_days + 1
+    if "tue" in check_days:
+        download_days = download_days + 2
+    if "wed" in check_days:
+        download_days = download_days + 4
+    if "thu" in check_days:
+        download_days = download_days + 8
+    if "fri" in check_days:
+        download_days = download_days + 16
+    if "sat" in check_days:
+        download_days = download_days + 32
+    if "sun" in check_days:
+        download_days = download_days + 64
+
+    return download_days
+
 def main_usage():
     print ("Usage: " + exe_name + " <command> [help]")
     print ("       command is one of:")
@@ -49,6 +69,7 @@ if sys.argv[1].lower() == "add":
         published_time_before = None
         include = None
         exclude = None
+        download_days = 127
 
         for i in range(2, argc):
             if sys.argv[i][0:6] == "--url=" and validators.url(sys.argv[i][6:]) == True:
@@ -81,10 +102,12 @@ if sys.argv[1].lower() == "add":
                 include = sys.argv[i][10:]
             if sys.argv[i][0:10] == "--exclude=":
                 exclude = sys.argv[i][10:]
+            if sys.argv[i][0:7] == "--days=":
+                download_days = stringToIntDays(sys.argv[i][7:])
 
         _pcd.add(url = url, name = name, min_size = min_size, max_size = max_size, destination = destination,
                  min_duration = min_duration, max_duration = max_duration, published_time_before = published_time_before,
-                 published_time_after = published_time_after, include = include, exclude = exclude)
+                 published_time_after = published_time_after, include = include, exclude = exclude, download_days = download_days)
 
 elif sys.argv[1].lower() == "delete":
     if argc == 2 or sys.argv[2].lower() == "help":
@@ -113,6 +136,7 @@ elif sys.argv[1].lower() == "edit":
     enabled = None
     include = None
     exclude = None
+    download_days = None
 
     for i in range(2, argc):
         if sys.argv[i][0:5] == "--id=":
@@ -149,6 +173,8 @@ elif sys.argv[1].lower() == "edit":
             include = sys.argv[i][10:]
         if sys.argv[i][0:10] == "--exclude=":
             exclude = sys.argv[i][10:]
+        if sys.argv[i][0:7] == "--days=":
+            download_days = stringToIntDays(sys.argv[i][7:])
 
     if edit_uuid is None:
         _pcd.edit_usage()
@@ -178,6 +204,8 @@ elif sys.argv[1].lower() == "edit":
             changed = _pcd.edit(edit_uuid, "include", include) or changed
         if exclude is not None:
             changed = _pcd.edit(edit_uuid, "exclude", exclude) or changed
+        if download_days is not None:
+            changed = _pcd.edit(edit_uuid, "download_days", download_days) or changed
 
         if changed == True:
             print (edit_uuid + " edited successfully")

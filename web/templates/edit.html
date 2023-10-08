@@ -62,9 +62,40 @@
                 <div class="col-sm-10"><input name="enabled" id="enabled" class="form-check-input" type="checkbox" {% if podcast["enabled"] == 1 or is_new == 1 %}checked{% endif %}></div>
             </div>
             <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="enabled">Download days</label>
+                <div class="col-sm-10">
+                    <select name="download_days" id="download_days" multiple>
+                        <option value="1" {%  if has_mon == 1 or is_new == 1 %}selected{% endif %}>Monday</option>
+                        <option value="2" {%  if has_tue == 1 or is_new == 1 %}selected{% endif %}>Tuesday</option>
+                        <option value="4" {%  if has_wed == 1 or is_new == 1 %}selected{% endif %}>Wednesday</option>
+                        <option value="8" {%  if has_thu == 1 or is_new == 1 %}selected{% endif %}>Thursday</option>
+                        <option value="16" {% if has_fri == 1 or is_new == 1 %}selected{% endif %}>Friday</option>
+                        <option value="32" {% if has_sat == 1 or is_new == 1 %}selected{% endif %}>Saturday</option>
+                        <option value="64" {% if has_sun == 1 or is_new == 1 %}selected{% endif %}>Sunday</option>
+                    </select>
+                </div>
+                <input type="hidden" id="total_days_value" name="total_days_value" value="{{ total_days_value }}"/>
+            </div>
+            <div class="form-group row">
                 <input type="submit" value="Save">
             </div>
         </form>
+        <script>
+
+            $('#download_days').multiSelect({
+                selectableHeader: '<div class="alert alert-danger">Ignored days</div>',
+                selectionHeader: '<div class="alert alert-success">Download days</div>',
+
+                afterSelect: function(values){
+                    newValue = Number($("#total_days_value").val()) + Number(values);
+                    $("#total_days_value").val(newValue);
+                },
+                afterDeselect: function(values){
+                    newValue = Number($("#total_days_value").val()) - Number(values);
+                    $("#total_days_value").val(newValue);
+                }
+            });
+        </script>
         {% else %}
             <span>UUID is invalid</span>
         {% endif %}

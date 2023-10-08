@@ -119,6 +119,7 @@ def edit(edit_id):
         destination = data["destination"]
         include = data["include"]
         exclude = data["exclude"]
+        download_days = data["total_days_value"]
         enabled = False
         if "enabled" in data:
             enabled = data["enabled"].lower() == "on"
@@ -147,7 +148,7 @@ def edit(edit_id):
             _pcd.add(url=url, name=name, min_size=min_size,
                      max_size=max_size, min_duration=min_duration, max_duration=max_duration,
                      published_time_before=published_time_before_int, published_time_after=published_time_after_int, destination=destination,
-                     enabled=enabled, include=include, exclude=exclude)
+                     enabled=enabled, include=include, exclude=exclude, download_days = download_days)
             return redirect("/list", code=302)
         elif valid == True:
             _pcd.edit(uuid=id, key="name", value=name, flask_update=True)
@@ -162,6 +163,7 @@ def edit(edit_id):
             _pcd.edit(uuid=id, key="enabled", value=enabled, flask_update=True)
             _pcd.edit(uuid=id, key="include", value=include, flask_update=True)
             _pcd.edit(uuid=id, key="exclude", value=exclude, flask_update=True)
+            _pcd.edit(uuid=id, key="download_days", value=download_days, flask_update=True)
             return redirect("/list", code=302)
 
     else:
@@ -186,7 +188,73 @@ def edit(edit_id):
         published_time_after_time = published_time_after_time[:2] + ":" + published_time_after_time[2:4] + ":" + published_time_after_time[-2:]
         if published_time_after_time == "24:00:00": published_time_after_time = "00:00:00"
 
-    return render_template('edit.html', found=found, podcast=data, is_new=is_new, edit_id=edit_id, published_time_before_time=published_time_before_time, published_time_after_time=published_time_after_time)
+    has_mon = True
+    has_tue = True
+    has_wed = True
+    has_thu = True
+    has_fri = True
+    has_sat = True
+    has_sun = True
+    total_days_value = 127
+
+    if data is not None and "download_days" in data:
+        if data["download_days"] is not None:
+            total_days_value = 0
+            has_mon = False
+            has_tue = False
+            has_wed = False
+            has_thu = False
+            has_fri = False
+            has_sat = False
+            has_sun = False
+
+            if data["download_days"] & 1:
+                total_days_value = total_days_value + 1
+                has_mon = True
+
+            if data["download_days"] & 2:
+                total_days_value = total_days_value + 2
+                has_tue = True
+
+            if data["download_days"] & 4:
+                total_days_value = total_days_value + 4
+                has_wed = True
+
+
+            if data["download_days"] & 8:
+                total_days_value = total_days_value + 8
+                has_thu = True
+
+
+            if data["download_days"] & 16:
+                total_days_value = total_days_value + 16
+                has_fri = True
+
+
+            if data["download_days"] & 32:
+                total_days_value = total_days_value + 32
+                has_sat = True
+
+
+            if data["download_days"] & 64:
+                total_days_value = total_days_value + 64
+                has_sun = True
+
+    return render_template('edit.html',
+                           found=found,
+                           podcast=data,
+                           is_new=is_new,
+                           edit_id=edit_id,
+                           published_time_before_time=published_time_before_time,
+                           published_time_after_time=published_time_after_time,
+                           has_mon = has_mon,
+                           has_tue = has_tue,
+                           has_wed = has_wed,
+                           has_thu = has_thu,
+                           has_fri = has_fri,
+                           has_sat = has_sat,
+                           has_sun = has_sun,
+                           total_days_value = total_days_value)
 
 @app.route('/list')
 def list():

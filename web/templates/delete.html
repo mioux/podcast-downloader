@@ -10,7 +10,9 @@
         <form method="POST">
             <input type="hidden" name="delete_id" value="{{ delete_id }}">
             <input type="submit">
-            <a href="{{ url_for('list') }}">NO! Take me to the podcast list instead!</a>
         </form>
+    </div>
+    <div>
+        <a href="{{ url_for('list') }}">NO! Take me to the podcast list instead!</a>
     </div>
 {% endblock %}

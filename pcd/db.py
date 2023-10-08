@@ -106,6 +106,19 @@ def migrate_db(self):
         con.commit()
         version = '5'
 
+    if version == '5':
+        curs.execute("ALTER TABLE podcast ADD download_days INT")
+        # This is a bitmask starting from Monday
+        # SSFTWTM : 0101010 = Tuesday + Thursday + Staurday
+        curs.execute("UPDATE podcast SET download_days = 127")
+        # Bug correction with NULL values
+        curs.execute("UPDATE podcast SET download_days = 127")
+        curs.execute("UPDATE podcast SET include = '' WHERE include IS NULL")
+        curs.execute("UPDATE podcast SET exclude = '' WHERE exclude IS NULL")
+        curs.execute("UPDATE config SET configvalue = '6' WHERE configname = 'DB_VERSION';")
+        con.commit()
+        version = '6'
+
     con.close()
 
 def get_data(db_file, query):
@@ -138,7 +151,8 @@ def web_history(self):
                h.publish_time,
                h.dl_time,
                h.description,
-               CASE WHEN h.external_link = '' THEN h.url ELSE h.external_link END AS external_link
+               CASE WHEN h.external_link = '' THEN h.url ELSE h.external_link END AS external_link,
+               CASE WHEN download_days IS NULL THEN 127 ELSE download_days END AS download_days
         FROM podcast p INNER JOIN
              downloaded h ON h.uuid = p.uuid
         ORDER BY p.uuid, h.publish_time, h.dl_time, h.id""")

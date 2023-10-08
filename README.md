@@ -80,6 +80,7 @@ All --id= paramteres can be either "id" or "uuid". UUID may disapear sometime. I
         --destination=<folder>                  : Destination folder
         --include=<regular expression>          : Include podcasts whose title matches the regular expression. This uses case insensitive search.
         --exclude=<regular expression>          : Exclude podcasts whose title matches the regular expression. This uses case insensitive search.
+        --days=<mon,tue,wed,thu,fri,sat,sun>    : Download only on these days (default is all).
 
 ### Edit help
 
@@ -97,6 +98,7 @@ All --id= paramteres can be either "id" or "uuid". UUID may disapear sometime. I
         --include=<regular expression>          : Include podcasts whose title matches the regular expression. This uses case insensitive search.
         --exclude=<regular expression>          : Exclude podcasts whose title matches the regular expression. This uses case insensitive search.
         --enabled=<enabled>                     : If value is not 0 or empty, then enable podcast
+        --days=<mon,tue,wed,thu,fri,sat,sun>    : Download only on these days.
 
 ### Delete help
 
