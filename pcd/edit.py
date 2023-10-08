@@ -19,6 +19,7 @@ def edit_usage(self):
     print ("       --enabled=<enabled>                     : If value is not 0 or empty, then enable podcast")
     print ("       --include=<regular expression>          : Include podcasts whose title matches the regular expression. This uses case insensitive search.")
     print ("       --exclude=<regular expression>          : Exclude podcasts whose title matches the regular expression. This uses case insensitive search.")
+    print ("       --days=<mon,tue,wed,thu,fri,sat,sun>    : Download only on these days.")
 
 def edit(self, uuid, key, value, flask_update = False):
     if flask_update == False:

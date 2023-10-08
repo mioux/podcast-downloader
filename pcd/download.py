@@ -25,7 +25,7 @@ def dl(self):
 
     curs.execute("""SELECT uuid, url, name, min_size, max_size,
                             destination, min_duration, max_duration, published_time_before, published_time_after,
-                            include, exclude FROM podcast WHERE enabled = 1""")
+                            include, exclude, download_days FROM podcast WHERE enabled = 1""")
 
     data = curs.fetchall()
 
@@ -42,6 +42,7 @@ def dl(self):
         published_time_after = 0 if line[9] is None else line[9] # 000000
         include = "" if line[10] is None else line[10]
         exclude = "" if line[11] is None else line[11]
+        download_days = 127 if line[12] is None else line[12]
 
         if published_time_before == 0: published_time_before = 240000
 
@@ -88,9 +89,16 @@ def dl(self):
                     date_prefix = cur_date.strftime("%Y%m%d_%H%M%S - ")
                     date_published = cur_date
 
+                    # This turns Monday in 1, Tuesday in 2, Wednesday in 4, Thursday in 8....
+                    bitday = pow(2, cur_date.weekday() + 1)
+                    if bitday & download_days != bitday:
+                        do_download = False
+
                 published_time = int(cur_date.strftime("%H%M%S"))
                 if published_time > published_time_before or published_time < published_time_after:
                     do_download = False
+
+
 
             duration = 0
             if "itunes_duration" in entry:

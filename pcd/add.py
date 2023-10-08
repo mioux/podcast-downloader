@@ -16,10 +16,11 @@ def add_usage(self):
     print ("       --destination=<folder>                  : Destination folder")
     print ("       --include=<regular expression>          : Include podcasts whose title matches the regular expression. This uses case insensitive search.")
     print ("       --exclude=<regular expression>          : Exclude podcasts whose title matches the regular expression. This uses case insensitive search.")
+    print ("       --days=<mon,tue,wed,thu,fri,sat,sun>    : Download only on these days (default is all).")
 
 def add(self, url = "", name = "", min_size = None, max_size = None,
         min_duration = None, max_duration = None, published_time_before = None, published_time_after = None, add_uuid = None,
-        destination = None, enabled = True, include = "", exclude = "") -> str:
+        destination = None, enabled = True, include = "", exclude = "", download_days = 127) -> str:
 
     if add_uuid is None: add_uuid = str(uuid.uuid4())
 
@@ -39,15 +40,15 @@ def add(self, url = "", name = "", min_size = None, max_size = None,
             INSERT INTO podcast (
                 uuid, name, url, min_size, max_size,
                 destination, min_duration, max_duration, published_time_before, published_time_after,
-                enabled, include, exclude
+                enabled, include, exclude, download_days
             )
             VALUES (
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
-                ?, ?, ?)""", (
+                ?, ?, ?, ?)""", (
                     add_uuid, name, url, min_size, max_size,
                     destination, min_duration, max_duration, published_time_before, published_time_after,
-                    enabled, include, exclude
+                    enabled, include, exclude, download_days
                 ))
 
         print (add_uuid + " (" + name + ") added successfully")
