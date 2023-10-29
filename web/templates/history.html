@@ -23,7 +23,7 @@
                     <tr>
                         <td>{{ h["podcast_name"] }}</td>
                         <td><a href="{{ h["external_link"] }}">{{ h["name"] }}</a></td>
-                        <td>{{ h["description"] }}</td>
+                        <td>{{ h["description"]|safe }}</td>
                         <td>{{ h["publish_time"] }}</td>
                         <td>{{ h["dl_time"] }}</td>
                         <td><a href="{{ h["url"] }}"><i class="bi bi-cloud-download"></i></a></td>
