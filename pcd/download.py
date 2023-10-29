@@ -90,7 +90,7 @@ def dl(self):
                     date_published = cur_date
 
                     # This turns Monday in 1, Tuesday in 2, Wednesday in 4, Thursday in 8....
-                    bitday = pow(2, cur_date.weekday() + 1)
+                    bitday = pow(2, cur_date.weekday())
                     if bitday & download_days != bitday:
                         do_download = False
 
