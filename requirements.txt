@@ -4,4 +4,4 @@ validators
 feedparser
 Flask
 regex
-dateutil
+dateutils
