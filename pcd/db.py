@@ -80,7 +80,7 @@ def migrate_db(self):
             self.add(url = url, name = name, min_size = min_size, max_size = max_size, destination = destination,
                      min_duration = min_duration, max_duration = max_duration, published_time_before = published_time_before, published_time_after = published_time_after,
                      add_uuid = key)
-            version = '2'
+        version = '2'
 
     if version == '2':
         curs.execute("ALTER TABLE downloaded ADD name VARCHAR(1024)")
