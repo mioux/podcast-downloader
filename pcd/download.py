@@ -129,14 +129,15 @@ def dl(self):
                     curs = con.cursor()
                     curs.execute("SELECT count(*) FROM downloaded WHERE uuid = ? AND url = ?", (uuid, href))
 
-                    if curs.fetchone()[0] == 0 and do_download == True:
-                        file_extension = get_extension(href)
-                        file_dest = os.path.join(destination, date_prefix + format_filename(title) + file_extension)
-                        print("Downloading: " + file_dest)
-                        file_content = requests.get(href)
-                        os.makedirs(destination, exist_ok=True)
-                        with open(file_dest, 'wb') as fd:
-                            fd.write(file_content.content)
+                    if curs.fetchone()[0] == 0:
+                        if do_download == True:
+                            file_extension = get_extension(href)
+                            file_dest = os.path.join(destination, date_prefix + format_filename(title) + file_extension)
+                            print("Downloading: " + file_dest)
+                            file_content = requests.get(href)
+                            os.makedirs(destination, exist_ok=True)
+                            with open(file_dest, 'wb') as fd:
+                                fd.write(file_content.content)
 
                         curs.execute("INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link) VALUES (?, ?, ?, current_timestamp, ?, ?, ?)",
                                      (uuid, href, title, date_published, description, extrenal_link))
