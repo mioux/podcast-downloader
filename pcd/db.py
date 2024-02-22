@@ -144,18 +144,30 @@ def web_list(self):
     return get_data(self.db_file, "SELECT id, name, url, enabled FROM podcast")
 
 def web_history(self):
-    return get_data(self.db_file, """
-        SELECT p.name AS podcast_name,
-               h.url,
-               CASE h.name WHEN '' THEN h.url ELSE h.name END AS name,
-               h.publish_time,
-               h.dl_time,
-               h.description,
-               CASE WHEN h.external_link = '' THEN h.url ELSE h.external_link END AS external_link,
-               CASE WHEN download_days IS NULL THEN 127 ELSE download_days END AS download_days
+    data = {}
+
+    data["_"] = get_data(self.db_file, """
+        SELECT DISTINCT p.name AS podcast_name
         FROM podcast p INNER JOIN
              downloaded h ON h.uuid = p.uuid
-        ORDER BY p.uuid, h.publish_time, h.dl_time, h.id""")
+        ORDER BY p.uuid""")
+
+    for podcast in data["_"]:
+        data[podcast["podcast_name"]] = get_data(self.db_file, """
+            SELECT p.name AS podcast_name,
+                   h.url,
+                   CASE h.name WHEN '' THEN h.url ELSE h.name END AS name,
+                   h.publish_time,
+                   h.dl_time,
+                   h.description,
+                   CASE WHEN h.external_link = '' THEN h.url ELSE h.external_link END AS external_link,
+                   CASE WHEN download_days IS NULL THEN 127 ELSE download_days END AS download_days
+            FROM podcast p INNER JOIN
+                 downloaded h ON h.uuid = p.uuid
+            WHERE p.name = '__NAME__'
+            ORDER BY p.name""".replace("__NAME__", podcast["podcast_name"].replace("'", "''")))
+
+    return data
 
 def web_podcast_detail(self, id):
     con = sqlite3.connect(self.db_file)

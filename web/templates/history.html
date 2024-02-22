@@ -6,33 +6,46 @@
 {% block inpagetitle %}History{% endblock %}
 
 {% block content %}
-    <div>
-        <table class="table table-striped" id="tbl_history">
+  <div>
+    <div class="accordion" id="podcast-list">
+      {% for name in history["_"] %}
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="false" aria-controls="collapse-{{ loop.index }}">
+            {{ name["podcast_name"] }}
+          </button>
+        </h2>
+        <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#podcast-list">
+          <table class="table table-striped" id="tblhistory-{{ loop.index }}">
             <thead>
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Published</th>
-                    <th scope="col">Downloaded</th>
-                    <th scope="col"><i class="bi bi-cloud-download"></i></th>
-                </tr>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Published</th>
+                <th scope="col">Downloaded</th>
+                <th scope="col"><i class="bi bi-cloud-download"></i></th>
+              </tr>
             </thead>
             <tbody>
-                {% for h in history %}
-                    <tr>
-                        <td>{{ h["podcast_name"] }}</td>
-                        <td><a href="{{ h["external_link"] }}">{{ h["name"] }}</a></td>
-                        <td>{{ h["description"]|safe }}</td>
-                        <td>{{ h["publish_time"] }}</td>
-                        <td>{{ h["dl_time"] }}</td>
-                        <td><a href="{{ h["url"] }}"><i class="bi bi-cloud-download"></i></a></td>
-                    </tr>
-                {% endfor %}
+              {% for h in history[name["podcast_name"]] %}
+                <tr>
+                  <td>{{ h["podcast_name"] }}</td>
+                  <td><a href="{{ h["external_link"] }}">{{ h["name"] }}</a></td>
+                  <td>{{ h["description"]|safe }}</td>
+                  <td>{{ h["publish_time"] }}</td>
+                  <td>{{ h["dl_time"] }}</td>
+                  <td><a href="{{ h["url"] }}"><i class="bi bi-cloud-download"></i></a></td>
+                </tr>
+              {% endfor %}
             </tbody>
-        </table>
+          </table>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-    <script>
-        $(document).ready( function() { $('#tbl_history').DataTable(); });
-    </script>
+  </div>
+  <script>
+    $(document).ready( function() { $('.table').DataTable(); });
+  </script>
 {% endblock %}
