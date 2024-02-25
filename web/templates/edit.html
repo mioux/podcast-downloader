@@ -6,6 +6,16 @@
 {% block inpagetitle %}{% if is_new == 1 %}Add{% else %}Edit{% endif %}{% endblock %}
 
 {% block content %}
+    <script language="javascript">
+
+        function setPodcastName()
+        {
+                fetch($("#url").val())
+                    .then(response => response.text())
+                    .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+                    .then(data => $("#name").val($(data).children("rss").children("channel").children("title")[0].textContent));
+        }
+    </script>
     <div>
         {% if is_new == 1 or found == 1 %}
         <form method="post" class="form-inline">
@@ -19,7 +29,14 @@
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="url">URL</label>
-                <div class="col-sm-10"><input type="text" name="url" id="url" class="form-control" placeholder="URL of the current podcast" value="{{ podcast["url"] }}"></div>
+                <div class="col-sm-10">
+                    <div class="input-group mb-3">
+                        <input type="text" name="url" id="url" class="form-control" placeholder="URL of the current podcast" value="{{ podcast["url"] }}" onchange="if ($('#name').val() == '' && $('#url').val() != '') setPodcastName()">
+                        <div class="input-group-apend">
+                            <button class="btn btn-outline-secondary" type="button" onclick="setPodcastName()">Update name</button>
+                        </div>
+                </div>
+                </div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="min_size">Minimal size</label>
