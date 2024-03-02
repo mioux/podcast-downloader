@@ -33,20 +33,21 @@ You need these packages to have this script work. Install it either via your dis
 - Flask
 - regex
 - dateutil
+- Pillow
 
 Example for Fedora 35:
 
-    sudo dnf install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil
+    sudo dnf install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil python3-willow
     pip install datefinder
 
 Example for Debian 11:
 
-    sudo apt install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil
+    sudo apt install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil python3-willow
     pip install datefinder
 
 All can be installed via pip:
 
-    pip install datefinder requests validators feedparser Flask regex dateutil
+    pip install datefinder requests validators feedparser Flask regex dateutil Pillow
     #or
     pip install -r requirements.txt
 

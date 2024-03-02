@@ -11,6 +11,7 @@
             <thead>
                 <tr>
                     <th scope="col">ID</th>
+                    <th scope="col">&nbsp;</th>
                     <th scope="col">Name</th>
                     <th scope="col">URL</th>
                     <th scope="col">Edit</th>
@@ -20,11 +21,12 @@
             <tbody>
                 {% for podcast in podcast_list %}
                     <tr>
-                        <th scope="row">{{ podcast["id"] }}</td>
-                        <td>{{ podcast["name"] }}</td>
-                        <td><a{% if podcast["enabled"] == 0 %} style="color: #808080;"{% endif %} href="{{ podcast["url"] }}">{{ podcast["url"] }}</a></td>
-                        <td><a href="{{ url_for('edit', edit_id=podcast["id"]) }}"><i class="bi bi-pencil"></i></a></td>
-                        <td><a href="{{ url_for('delete', delete_id=podcast["id"]) }}"><i class="bi bi-x-octagon-fill" style="color: red;"></i></a></td>
+                        <th scope="row" class="align-middle">{{ podcast["id"] }}</th>
+                        <td class="align-middle">{% if podcast["image_cache"] is not none %}<img src="data:image/png;base64,{{ podcast["image_cache"] | b64encode | e }}" alt="podcast illustration">{% else %}&nbsp;{% endif %}</td>
+                        <td class="align-middle">{{ podcast["name"] }}</td>
+                        <td class="align-middle"><a{% if podcast["enabled"] == 0 %} style="color: #808080;"{% endif %} href="{{ podcast["url"] }}">{{ podcast["url"] }}</a></td>
+                        <td class="align-middle"><a href="{{ url_for('edit', edit_id=podcast["id"]) }}"><i class="bi bi-pencil"></i></a></td>
+                        <td class="align-middle"><a href="{{ url_for('delete', delete_id=podcast["id"]) }}"><i class="bi bi-x-octagon-fill" style="color: red;"></i></a></td>
                     </tr>
                 {% endfor %}
             </tbody>

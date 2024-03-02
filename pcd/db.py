@@ -119,6 +119,15 @@ def migrate_db(self):
         con.commit()
         version = '6'
 
+    if version == '6':
+        curs.execute("ALTER TABLE podcast ADD image VARCHAR(1024)")
+        curs.execute("ALTER TABLE podcast ADD image_cache TEXT")
+        curs.execute("ALTER TABLE downloaded ADD image VARCHAR(1024)")
+        curs.execute("ALTER TABLE downloaded ADD image_cache TEXT")
+        curs.execute("UPDATE config SET configvalue = '7' WHERE configname = 'DB_VERSION';")
+        con.commit()
+        version = '7'
+
     con.close()
 
 def get_data(db_file, query):
@@ -141,7 +150,7 @@ def config_dump(self):
     return get_data(self.db_file, "SELECT * FROM podcast")
 
 def web_list(self):
-    return get_data(self.db_file, "SELECT id, name, url, enabled FROM podcast")
+    return get_data(self.db_file, "SELECT id, name, url, enabled, image_cache FROM podcast")
 
 def web_history(self):
     data = {}
@@ -161,7 +170,8 @@ def web_history(self):
                    h.dl_time,
                    h.description,
                    CASE WHEN h.external_link = '' THEN h.url ELSE h.external_link END AS external_link,
-                   CASE WHEN download_days IS NULL THEN 127 ELSE download_days END AS download_days
+                   CASE WHEN download_days IS NULL THEN 127 ELSE download_days END AS download_days,
+                   h.image_cache
             FROM podcast p INNER JOIN
                  downloaded h ON h.uuid = p.uuid
             WHERE p.name = '__NAME__'

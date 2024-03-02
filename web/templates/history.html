@@ -19,7 +19,7 @@
           <table class="table table-striped" id="tblhistory-{{ loop.index }}">
             <thead>
               <tr>
-                <th scope="col">Name</th>
+                <th scope="col">&nbsp;</th>
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
                 <th scope="col">Published</th>
@@ -30,12 +30,12 @@
             <tbody>
               {% for h in history[name["podcast_name"]] %}
                 <tr>
-                  <td>{{ h["podcast_name"] }}</td>
-                  <td><a href="{{ h["external_link"] }}">{{ h["name"] }}</a></td>
-                  <td>{{ h["description"]|safe }}</td>
-                  <td>{{ h["publish_time"] }}</td>
-                  <td>{{ h["dl_time"] }}</td>
-                  <td><a href="{{ h["url"] }}"><i class="bi bi-cloud-download"></i></a></td>
+                  <td class="align-middle">{% if h["image_cache"] is not none %}<img src="data:image/png;base64,{{ h["image_cache"] | b64encode | e }}" alt="podcast illustration">{% else %}&nbsp;{% endif %}</td>
+                  <td class="align-middle"><a href="{{ h["external_link"] }}">{{ h["name"] }}</a></td>
+                  <td class="align-middle">{{ h["description"]|safe }}</td>
+                  <td class="align-middle">{{ h["publish_time"] }}</td>
+                  <td class="align-middle">{{ h["dl_time"] }}</td>
+                  <td class="align-middle"><a href="{{ h["url"] }}"><i class="bi bi-cloud-download"></i></a></td>
                 </tr>
               {% endfor %}
             </tbody>

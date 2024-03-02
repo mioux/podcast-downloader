@@ -1,9 +1,8 @@
 #!/bin/env python3
 
-import os, ctypes, sys, validators
+import os, ctypes, sys, validators, jinja2, base64, uuid
 from flask import Flask, render_template, redirect, session, request
 from pcd import pcd
-import uuid
 
 def dict_factory(cursor, row):
     d = {}
@@ -273,3 +272,8 @@ def download():
     _pcd = init_pcd()
     _pcd.dl()
     return render_template('download.html')
+
+@app.template_filter('b64encode')
+def b64encode(input):
+    """Custom filter"""
+    return base64.b64encode(input).decode("ascii") if input is not None else ""

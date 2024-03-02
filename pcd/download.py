@@ -1,7 +1,9 @@
 #!/bin/env python3
 
 #from urllib import request
-import feedparser, os, sqlite3, requests, pathlib, datefinder, datetime, time, re, sys
+import feedparser, os, sqlite3, requests, pathlib, datefinder, datetime, time, re, sys, io
+from PIL import Image
+from urllib.request import urlopen
 
 config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-downloader")
 db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
@@ -25,7 +27,7 @@ def dl(self):
 
     curs.execute("""SELECT uuid, url, name, min_size, max_size,
                             destination, min_duration, max_duration, published_time_before, published_time_after,
-                            include, exclude, download_days FROM podcast WHERE enabled = 1""")
+                            include, exclude, download_days, image FROM podcast WHERE enabled = 1""")
 
     data = curs.fetchall()
 
@@ -43,6 +45,7 @@ def dl(self):
         include = "" if line[10] is None else line[10]
         exclude = "" if line[11] is None else line[11]
         download_days = 127 if line[12] is None else line[12]
+        last_image = "" if line[13] is None else line[13]
 
         if published_time_before == 0: published_time_before = 240000
 
@@ -53,8 +56,36 @@ def dl(self):
 
         print("Checking {name} ({uuid})".format(name=name, uuid=uuid))
 
+        image = rss["feed"]["image"]["href"]
+        if image != last_image and image != "":
+            try:
+                image_data = Image.open(urlopen(image))
+                image_data.thumbnail([sys.maxsize, 128], Image.LANCZOS)
+
+                byteIO = io.BytesIO()
+                image_data.save(byteIO, format='PNG')
+                image_data = byteIO.getvalue()
+
+            except Exception as exp:
+                print("Cannot download image", file=sys.stderr)
+                iamge_data = None
+
+            curs.execute("UPDATE podcast SET image = ?, image_cache = ? WHERE uuid = ?", (image, image_data, uuid))
+            con.commit()
+
         for entry in rss.entries:
             title = entry["title"]
+
+            image = entry["image"]["href"]
+            try:
+                image_data = Image.open(urlopen(image))
+                image_data.thumbnail([sys.maxsize, 128], Image.LANCZOS)
+
+                byteIO = io.BytesIO()
+                image_data.save(byteIO, format='PNG')
+                image_data = byteIO.getvalue()
+            except Exception as exp:
+                print("Cannot download image", file=sys.stderr)
 
             do_download = True
 
@@ -139,8 +170,8 @@ def dl(self):
                             with open(file_dest, 'wb') as fd:
                                 fd.write(file_content.content)
 
-                        curs.execute("INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link) VALUES (?, ?, ?, current_timestamp, ?, ?, ?)",
-                                     (uuid, href, title, date_published, description, extrenal_link))
+                        curs.execute("INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link, image, image_cache) VALUES (?, ?, ?, current_timestamp, ?, ?, ?, ?, ?)",
+                                     (uuid, href, title, date_published, description, extrenal_link, image, image_data))
                         con.commit()
 
     print("Downloading done")
