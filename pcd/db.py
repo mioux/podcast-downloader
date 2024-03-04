@@ -128,6 +128,12 @@ def migrate_db(self):
         con.commit()
         version = '7'
 
+    if version == '7':
+        curs.execute("ALTER TABLE podcast ADD description TEXT")
+        curs.execute("UPDATE config SET configvalue = '8' WHERE configname = 'DB_VERSION';")
+        con.commit()
+        version = '8'
+
     con.close()
 
 def get_data(db_file, query):
@@ -150,7 +156,7 @@ def config_dump(self):
     return get_data(self.db_file, "SELECT * FROM podcast")
 
 def web_list(self):
-    return get_data(self.db_file, "SELECT id, name, url, enabled, image_cache FROM podcast")
+    return get_data(self.db_file, "SELECT id, name, url, COALESCE(description, url) AS description, enabled, image_cache FROM podcast")
 
 def web_history(self):
     data = {}

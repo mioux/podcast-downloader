@@ -19,7 +19,7 @@ def get_extension(path):
 def format_filename(filename):
     return filename.replace("/", "_").replace(":", "_").replace("\\", "_").replace("*", "_").replace("?", "_").replace("\"", "''")
 
-def dl(self):
+def dl(self, dl_episodes = True):
     print("Start downloading process")
 
     con = sqlite3.connect(self.db_file)
@@ -27,7 +27,8 @@ def dl(self):
 
     curs.execute("""SELECT uuid, url, name, min_size, max_size,
                             destination, min_duration, max_duration, published_time_before, published_time_after,
-                            include, exclude, download_days, image FROM podcast WHERE enabled = 1""")
+                            include, exclude, download_days, image, description
+                 FROM podcast WHERE enabled = 1""")
 
     data = curs.fetchall()
 
@@ -46,6 +47,7 @@ def dl(self):
         exclude = "" if line[11] is None else line[11]
         download_days = 127 if line[12] is None else line[12]
         last_image = "" if line[13] is None else line[13]
+        description = "" if line[14] is None else line[14]
 
         if published_time_before == 0: published_time_before = 240000
 
@@ -73,6 +75,12 @@ def dl(self):
             curs.execute("UPDATE podcast SET image = ?, image_cache = ? WHERE uuid = ?", (image, image_data, uuid))
             con.commit()
 
+        if description != rss["feed"]["description"]:
+            desciption = rss["feed"]["description"]
+
+            curs.execute("UPDATE podcast SET description = ? WHERE uuid = ?", (desciption, uuid))
+            con.commit()
+
         for entry in rss.entries:
             title = entry["title"]
 
@@ -87,7 +95,7 @@ def dl(self):
             except Exception as exp:
                 print("Cannot download image", file=sys.stderr)
 
-            do_download = True
+            do_download = dl_episodes
 
             if include != "":
                 try:
@@ -111,7 +119,6 @@ def dl(self):
                     else:
                         print(exp)
 
-
             date_prefix = ""
             date_published = datetime.datetime.now()
             if "published" in entry:
@@ -128,8 +135,6 @@ def dl(self):
                 published_time = int(cur_date.strftime("%H%M%S"))
                 if published_time > published_time_before or published_time < published_time_after:
                     do_download = False
-
-
 
             duration = 0
             if "itunes_duration" in entry:
