@@ -32,7 +32,7 @@
                 <tr>
                   <td class="align-middle">{% if h["image_cache"] is not none %}<img src="data:image/png;base64,{{ h["image_cache"] | b64encode | e }}" alt="podcast illustration">{% else %}&nbsp;{% endif %}</td>
                   <td class="align-middle"><a href="{{ h["external_link"] }}">{{ h["name"] }}</a></td>
-                  <td class="align-middle">{{ h["description"]|safe }}</td>
+                  <td class="align-middle">{{ h["description"] | safe }}</td>
                   <td class="align-middle">{{ h["publish_time"] }}</td>
                   <td class="align-middle">{{ h["dl_time"] }}</td>
                   <td class="align-middle"><a href="{{ h["url"] }}"><i class="bi bi-cloud-download"></i></a></td>
