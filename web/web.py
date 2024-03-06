@@ -1,8 +1,10 @@
 #!/bin/env python3
 
-import os, ctypes, sys, validators, jinja2, base64, uuid
-from flask import Flask, render_template, redirect, session, request
+import os, ctypes, sys, validators, base64, requests, feedparser, json
+from flask import Flask, render_template, redirect, session, request, Response
 from pcd import pcd
+from urllib.parse import unquote
+
 
 def dict_factory(cursor, row):
     d = {}
@@ -272,6 +274,33 @@ def download():
     _pcd = init_pcd()
     _pcd.dl()
     return render_template('download.html')
+
+@app.route('/proxy/<string:url_to_call>')
+def proxy(url_to_call):
+    url_to_call = unquote(url_to_call) # Need to decrypt double encoded URL
+    content = requests.get(url_to_call)
+
+    try:
+        checkfeed = feedparser.parse(content.text)
+        if hasattr(checkfeed, 'feed') == False:
+            raise "Not a RSS"
+        elif checkfeed["feed"]["title"] is None or checkfeed["feed"]["title"] == "":
+            raise "Not a RSS"
+        
+    except:
+        # Not an RSS, check if json
+        try:
+            json.loads(content.text)
+        except:
+            # Not a json : stop here as we are waiting only for json or rss in proxy
+            # This reduces the array of attack if the website is worldwide accessible
+            # and someone tries to use it as a HTTPx proxy
+            raise "Invalid data! Use only for RSS or json api!"
+    
+    resp = Response(content)
+    resp.headers["Access-Control-Allow-Origin"] = "Same-Origin"
+
+    return content.text
 
 @app.template_filter('b64encode')
 def b64encode(input):
