@@ -1,12 +1,17 @@
 #!/bin/env python3
 
-#from urllib import request
 import feedparser, os, sqlite3, requests, pathlib, datefinder, datetime, time, re, sys, io
 from PIL import Image
 from urllib.request import urlopen
 
 config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-downloader")
 db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
+
+def get_image(url):
+    print("Fetching image: " + url)
+    r = requests.get(url, timeout=60)
+    i = Image.open(io.BytesIO(r.content))
+    return i
 
 def get_extension(path):
     extension = pathlib.Path(path).suffix
@@ -61,7 +66,7 @@ def dl(self, dl_episodes = True):
         image = rss["feed"]["image"]["href"]
         if image != last_image and image != "":
             try:
-                image_data = Image.open(urlopen(image))
+                image_data = get_image(image)
                 image_data.thumbnail([sys.maxsize, 128], Image.LANCZOS)
 
                 byteIO = io.BytesIO()
@@ -86,7 +91,8 @@ def dl(self, dl_episodes = True):
 
             image = entry["image"]["href"]
             try:
-                image_data = Image.open(urlopen(image))
+
+                image_data = get_image(image)
                 image_data.thumbnail([sys.maxsize, 128], Image.LANCZOS)
 
                 byteIO = io.BytesIO()
