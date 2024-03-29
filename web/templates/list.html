@@ -16,6 +16,7 @@
                     <th scope="col">URL</th>
                     <th scope="col">Edit</th>
                     <th scope="col">Delete</th>
+                    <th scope="col"><i class="bi bi-cloud-download"></i></th>
                 </tr>
             </thead>
             <tbody>
@@ -27,6 +28,7 @@
                         <td class="align-middle">{{ podcast["description"] | safe }}</td>
                         <td class="align-middle"><a href="{{ url_for('edit', edit_id=podcast["id"]) }}"><i class="bi bi-pencil"></i></a></td>
                         <td class="align-middle"><a href="{{ url_for('delete', delete_id=podcast["id"]) }}"><i class="bi bi-x-octagon-fill" style="color: red;"></i></a></td>
+                        <td class="align-middle"><a href="{{ url_for("downloadPodcast", dl_id=podcast["id"]|int) }}"><i class="bi bi-cloud-download"></i></a></td>
                     </tr>
                 {% endfor %}
             </tbody>
