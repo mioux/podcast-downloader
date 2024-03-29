@@ -64,7 +64,9 @@ All --id= paramteres can be either "id" or "uuid". UUID may disapear sometime. I
                delete      : Delete a podcast
                list        : List podcast - id: friendly name
                dump-config : Display configuration json style
+               dump        : Alias for dump-config
                web         : Starts web server (default port : 8000)
+               download    : Download files
            see 'help' subcommand for more information
 
 ### Add help
@@ -121,3 +123,12 @@ All --id= paramteres can be either "id" or "uuid". UUID may disapear sometime. I
         --port=<port>                 : Set port to listen on
         --listen=<ip or URL to listen>: Set IP/URL to listen on (not validated, be sure of your value)
         --debug=[1|ON|YES|TRUE]
+
+### Download help
+
+    Usage: podcast-downloader web [--id|uuid=<id|uuid>] [--url=<url of file>]
+        Without parameters, same as ./podcast-downloader without arguments
+        --id|uuid=<id|uuid>: Download only for <id> or <uuid>. Both are interchangeable (--id can be used with uuid value and --uuid can be used wit id value)
+        --url=<url>        : Download only the file identified by the url (mostly used with the history tab)
+                             WARNING: Forcing with URL don't apply regex filters
+                             WARNING: URL MUST be available in current RSS feed. If your broadcaster removes the link from the feed, the podcast-downloader won't download it. You can still get the link in "downloaded" table

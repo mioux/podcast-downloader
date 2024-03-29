@@ -169,7 +169,8 @@ def web_history(self):
 
     for podcast in data["_"]:
         data[podcast["podcast_name"]] = get_data(self.db_file, """
-            SELECT p.name AS podcast_name,
+            SELECT p.id,
+                   p.name AS podcast_name,
                    h.url,
                    CASE h.name WHEN '' THEN h.url ELSE h.name END AS name,
                    h.publish_time,
