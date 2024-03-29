@@ -52,7 +52,7 @@ _pcd.migrate_db()
 argc = len(sys.argv)
 
 if len(sys.argv) == 1 or sys.argv[1].lower() == "download":
-    if sys.argv[2].lower() == "help":
+    if argc > 1 and sys.argv[2].lower() == "help":
         _pcd.add_usage()
     else:
         dl_id = None
