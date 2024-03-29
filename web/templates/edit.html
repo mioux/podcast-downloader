@@ -8,12 +8,108 @@
 {% block content %}
     <script language="javascript">
 
+        var table_result;
+
         function setPodcastName()
         {
-                fetch($("#url").val())
+                fetch('/proxy/' + encodeURIComponent(encodeURIComponent($("#url").val())))
                     .then(response => response.text())
                     .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
                     .then(data => $("#name").val($(data).children("rss").children("channel").children("title")[0].textContent));
+        }
+
+        function searchPodcast()
+        {
+            searchTerm = encodeURIComponent($("#search").val());
+
+            urlToCal = 'https://itunes.apple.com/search?term=' + searchTerm + '&media=podcast';
+            
+            $.ajax({
+                'url': '/proxy/' + encodeURIComponent(encodeURIComponent(urlToCal)), // Double encodeURIComponent to handle %2F
+                'type': 'GET',
+                'dataType': 'json',
+                'headers': { 'Access-Control-Allow-Origin': document.URL },
+                'success': function(response) {
+                    searchPodcastCallback(response);
+                }, 'error': function(response) {
+                    alert("Error while searching for podcast");
+                }
+            });
+        }
+
+        function searchPodcastCallback(response)
+        {
+            if($.fn.DataTable.isDataTable("#table-result") == true)
+            {
+                table_result.destroy()
+            }
+            
+            table_result = $("#table-result").DataTable(
+                {
+                    "data": response.results,
+                    "columns": [
+                        {
+                            "data": "artworkUrl100",
+                            "render": function (data, type, row, meta) {
+                                return "<img src=\"" + data + "\" alt=\"Podcast illustration\">"
+                            }
+                        },
+                        { "data": "artistName" },
+                        { "data": "collectionName" },
+                        {
+                            "data": "collectionId",
+                            "render": function (data, type, row, meta) {
+                                return "<a href=\"#\" onclick=\"selectThisPodcast('" + data + "')\">Select</a>"
+                            }
+                        }
+                    ],
+                    "columnDefs": [
+                        {
+                            targets: "_all",
+                            className: "align-middle"
+                        }
+                    ]
+                }
+            );
+            $("#div-result").removeClass("d-none");
+        }
+
+        function selectThisPodcast(id)
+        {
+            urlToCal = 'https://itunes.apple.com/lookup?id=' + id.toString() + '&entity=podcast';
+
+            $.ajax({
+                'url': '/proxy/' + encodeURIComponent(encodeURIComponent(urlToCal)), // Double encodeURIComponent to handle %2F
+                'type': 'GET',
+                'dataType': 'json',
+                'success': function(response) {
+                    selectThisPodcastCallback(response);
+                }, 'error': function(response) {
+                    alert("Error while setting podcast");
+                }
+            });
+        }
+
+        function selectThisPodcastCallback(response)
+        {
+            if (response.resultCount == 0)
+            {
+                alert("No podcast found (is ID correct ?)");
+                return;
+            }
+
+            url = response.results[0].feedUrl;
+
+            if (typeof url !== "undefined")
+            {
+                $("#url").val(url);
+                if ($("#name").val() == "" && $("#url").val() != "")
+                    setPodcastName();
+            }
+            else
+            {
+                alert("No URL of podcast found (hidden by the author). Cannot proceed.");
+            }
         }
     </script>
     <div>
@@ -28,6 +124,36 @@
                 <div class="col-sm-10"><input type="text" name="name" id="name" class="form-control" placeholder="Name of the current podcast" value="{{ podcast["name"] }}"></div>
             </div>
             <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="search">Search on <i class="fa fa-apple" aria-hidden="true" title="Apple"></i>Podcasts</label>
+                <div class="col-sm-10">
+                    <div class="input-group mb-3">
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Search query" value="">
+                        <div class="input-group-apend">
+                            <button class="btn btn-outline-secondary" type="button" onclick="searchPodcast()">search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row d-none" id="div-result" name="div-result">
+                <label class="col-sm-2 col-form-label" for="table-result">Results</label>
+                <div class="col-sm-10">
+                    <div class="input-group mb-3">
+                        <table id="table-result" name="table-result" class="table table-striped" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>&nbsp;</th>
+                                    <th>Author</th>
+                                    <th>Name</th>
+                                    <th>URL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="url">URL</label>
                 <div class="col-sm-10">
                     <div class="input-group mb-3">
@@ -35,7 +161,7 @@
                         <div class="input-group-apend">
                             <button class="btn btn-outline-secondary" type="button" onclick="setPodcastName()">Update name</button>
                         </div>
-                </div>
+                    </div>
                 </div>
             </div>
             <div class="form-group row">

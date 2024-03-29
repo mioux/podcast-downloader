@@ -7,6 +7,16 @@ from urllib.request import urlopen
 config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-downloader")
 db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
 
+def dl_usage(self):
+
+    print ("Usage: podcast-downloader web [--id|uuid=<id|uuid>] [--url=<url of file>]")
+    print ("    Without parameters, same as ./podcast-downloader without arguments")
+    print ("    --id|uuid=<id|uuid>: Download only for <id> or <uuid>. Both are interchangeable (--id can be used with uuid value and --uuid can be used wit id value)")
+    print ("    --url=<url>        : Download only the file identified by the url (mostly used with the history tab)")
+    print ("                         WARNING: Forcing with URL don't apply regex filters")
+    print ("                         WARNING: URL MUST be available in current RSS feed. If your broadcaster removes the link from the feed, the podcast-downloader won't download it. You can still get the link in \"downloaded\" table")
+
+
 def get_image(url):
     print("Fetching image: " + url)
     r = requests.get(url, timeout=60)
@@ -24,7 +34,7 @@ def get_extension(path):
 def format_filename(filename):
     return filename.replace("/", "_").replace(":", "_").replace("\\", "_").replace("*", "_").replace("?", "_").replace("\"", "''")
 
-def dl(self, dl_episodes = True):
+def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
     print("Start downloading process")
 
     con = sqlite3.connect(self.db_file)
@@ -33,7 +43,7 @@ def dl(self, dl_episodes = True):
     curs.execute("""SELECT uuid, url, name, min_size, max_size,
                             destination, min_duration, max_duration, published_time_before, published_time_after,
                             include, exclude, download_days, image, description
-                 FROM podcast WHERE enabled = 1""")
+                 FROM podcast WHERE ? IS NULL AND enabled = 1 OR CAST(? AS VARCHAR(36)) IN (CAST(id AS VARCHAR(36)), uuid)""", (dl_id, str(dl_id)))
 
     data = curs.fetchall()
 
@@ -89,41 +99,30 @@ def dl(self, dl_episodes = True):
         for entry in rss.entries:
             title = entry["title"]
 
-            image = entry["image"]["href"]
-            try:
-
-                image_data = get_image(image)
-                image_data.thumbnail([sys.maxsize, 128], Image.LANCZOS)
-
-                byteIO = io.BytesIO()
-                image_data.save(byteIO, format='PNG')
-                image_data = byteIO.getvalue()
-            except Exception as exp:
-                print("Cannot download image", file=sys.stderr)
-
             do_download = dl_episodes
 
-            if include != "":
-                try:
-                    if re.search(include, title, re.IGNORECASE) is None:
-                        do_download = False
-                except Exception as exp:
-                    print("Invalid \"include\" regular expression: ", file=sys.stderr)
-                    if hasattr(exp, "message"):
-                        print(exp.message, file=sys.stderr)
-                    else:
-                        print(exp)
+            if dl_url is None:
+                if include != "":
+                    try:
+                        if re.search(include, title, re.IGNORECASE) is None:
+                            do_download = False
+                    except Exception as exp:
+                        print("Invalid \"include\" regular expression: ", file=sys.stderr)
+                        if hasattr(exp, "message"):
+                            print(exp.message, file=sys.stderr)
+                        else:
+                            print(exp)
 
-            if exclude != "":
-                try:
-                    if re.search(exclude, title, re.IGNORECASE) is not None:
-                        do_download = False
-                except Exception as exp:
-                    print("Invalid \"include\" regular expression: ", file=sys.stderr)
-                    if hasattr(exp, "message"):
-                        print(exp.message, file=sys.stderr)
-                    else:
-                        print(exp)
+                if exclude != "":
+                    try:
+                        if re.search(exclude, title, re.IGNORECASE) is not None:
+                            do_download = False
+                    except Exception as exp:
+                        print("Invalid \"include\" regular expression: ", file=sys.stderr)
+                        if hasattr(exp, "message"):
+                            print(exp.message, file=sys.stderr)
+                        else:
+                            print(exp)
 
             date_prefix = ""
             date_published = datetime.datetime.now()
@@ -161,6 +160,8 @@ def dl(self, dl_episodes = True):
             for link in entry["links"]:
                 if link["type"][0:5].lower() != "text/":
                     href = link["href"]
+                    if dl_url is not None and dl_url != href:
+                        do_download = False
 
                     if "length" in link:
                         length = float(link["length"]) / 1024 / 1024
@@ -171,7 +172,7 @@ def dl(self, dl_episodes = True):
                     curs = con.cursor()
                     curs.execute("SELECT count(*) FROM downloaded WHERE uuid = ? AND url = ?", (uuid, href))
 
-                    if curs.fetchone()[0] == 0:
+                    if curs.fetchone()[0] == 0 or dl_url is not None:
                         if do_download == True:
                             file_extension = get_extension(href)
                             file_dest = os.path.join(destination, date_prefix + format_filename(title) + file_extension)
@@ -181,8 +182,27 @@ def dl(self, dl_episodes = True):
                             with open(file_dest, 'wb') as fd:
                                 fd.write(file_content.content)
 
-                        curs.execute("INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link, image, image_cache) VALUES (?, ?, ?, current_timestamp, ?, ?, ?, ?, ?)",
-                                     (uuid, href, title, date_published, description, extrenal_link, image, image_data))
-                        con.commit()
+                        if do_download == True or dl_url is None:
+
+                            image = entry["image"]["href"]
+                            try:
+
+                                image_data = get_image(image)
+                                image_data.thumbnail([sys.maxsize, 128], Image.LANCZOS)
+
+                                byteIO = io.BytesIO()
+                                image_data.save(byteIO, format='PNG')
+                                image_data = byteIO.getvalue()
+                            except Exception as exp:
+                                print("Cannot download image", file=sys.stderr)
+
+                            curs.execute("""INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link, image, image_cache) 
+                                         SELECT ?, ?, ?, current_timestamp, ?, ?, ?, ?, ? 
+                                         WHERE NOT EXISTS (SELECT 1 FROM downloaded WHERE uuid = ? and url = ?)""",
+                                         (uuid, href, title, date_published, description, extrenal_link, image, image_data, 
+                                          uuid, href))
+
+                            con.commit()
 
     print("Downloading done")
+
