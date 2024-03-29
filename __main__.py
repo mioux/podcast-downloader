@@ -41,6 +41,7 @@ def main_usage():
     print ("           delete      : Delete a podcast")
     print ("           list        : List podcast - id: friendly name")
     print ("           dump-config : Display the raw config file")
+    print ("           dump        : Alias for dump-config")
     print ("           web         : Starts web server")
     print ("       see 'help' subcommand for more information")
 
@@ -50,8 +51,23 @@ _pcd.migrate_db()
 
 argc = len(sys.argv)
 
-if len(sys.argv) == 1:
-    _pcd.dl()
+if len(sys.argv) == 1 or sys.argv[1].lower() == "download":
+    if sys.argv[2].lower() == "help":
+        _pcd.add_usage()
+    else:
+        dl_id = None
+        dl_url = None
+
+        for i in range(2, argc):
+            if sys.argv[i][0:5] == "--id=":
+                dl_id = sys.argv[i][5:]
+            if sys.argv[i][0:7] == "--uuid=":
+                dl_id = sys.argv[i][7:]
+            if sys.argv[i][0:6] == "--url=":
+                dl_url = sys.argv[i][6:]
+
+        _pcd.dl(dl_url=dl_url, dl_id=dl_id)
+
     sys.exit(0)
 
 if sys.argv[1].lower() == "add":
@@ -219,9 +235,9 @@ elif sys.argv[1].lower() == "list":
         data = _pcd.podcast_list()
         for line in data:
             print(line["pc_detail"])
-elif sys.argv[1].lower() == "dump-config":
+elif sys.argv[1].lower() == "dump-config" or sys.argv[1].lower() == "dump" :
     if argc == 3 and sys.argv[2].lower() == "help":
-        print ("Usage: " + exe_name + " dump-config")
+        print ("Usage: " + exe_name + " " + sys.argv[1].lower())
     else:
         data = _pcd.config_dump()
 
@@ -231,7 +247,7 @@ elif sys.argv[1].lower() == "dump-config":
             headers = line.keys()
             js_data[line["uuid"]] = { }
             for h in headers:
-                if h != "uuid":
+                if h != "uuid" and h[-6:] != "_cache":
                     js_data[line["uuid"]][h] = line[h]
         pprint(js_data)
 

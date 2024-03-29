@@ -24,6 +24,7 @@
                 <th scope="col">Description</th>
                 <th scope="col">Published</th>
                 <th scope="col">Downloaded</th>
+                <th scope="col"><i class="bi bi-download"></i></th>
                 <th scope="col"><i class="bi bi-cloud-download"></i></th>
               </tr>
             </thead>
@@ -35,7 +36,8 @@
                   <td class="align-middle">{{ h["description"] | safe }}</td>
                   <td class="align-middle">{{ h["publish_time"] }}</td>
                   <td class="align-middle">{{ h["dl_time"] }}</td>
-                  <td class="align-middle"><a href="{{ h["url"] }}"><i class="bi bi-cloud-download"></i></a></td>
+                  <td class="align-middle"><a href="{{ h["url"] }}"><i class="bi bi-download"></i></a></td>
+                  <td class="align-middle"><a href="{{ url_for("downloadItem", dl_id=h["id"]|int, dl_url=h["url"]|str32encode) }}"><i class="bi bi-cloud-download"></i></a></td>
                 </tr>
               {% endfor %}
             </tbody>
