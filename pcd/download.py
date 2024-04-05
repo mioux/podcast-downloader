@@ -4,7 +4,7 @@ import feedparser, os, sqlite3, requests, pathlib, datefinder, datetime, time, r
 from PIL import Image
 from urllib.request import urlopen
 
-config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-downloader")
+config_dir = os.path.join(os.path.expanduser('~'), ".config", "podcast-downloader")
 db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
 
 def dl_usage(self):
@@ -196,13 +196,12 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
                             except Exception as exp:
                                 print("Cannot download image", file=sys.stderr)
 
-                            curs.execute("""INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link, image, image_cache) 
-                                         SELECT ?, ?, ?, current_timestamp, ?, ?, ?, ?, ? 
+                            curs.execute("""INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link, image, image_cache)
+                                         SELECT ?, ?, ?, current_timestamp, ?, ?, ?, ?, ?
                                          WHERE NOT EXISTS (SELECT 1 FROM downloaded WHERE uuid = ? and url = ?)""",
-                                         (uuid, href, title, date_published, description, extrenal_link, image, image_data, 
+                                         (uuid, href, title, date_published, description, extrenal_link, image, image_data,
                                           uuid, href))
 
                             con.commit()
 
     print("Downloading done")
-

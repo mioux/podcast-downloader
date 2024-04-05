@@ -5,7 +5,7 @@ from pcd import pcd
 from pprint import pprint
 from web import web
 
-config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-downloader")
+config_dir = os.path.join(os.path.expanduser('~'), ".config", "podcast-downloader")
 config_file = os.path.join(config_dir, "podcast-downloader.cfg") # Not used, for compatibility with very early version
 db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
 

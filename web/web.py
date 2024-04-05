@@ -51,7 +51,7 @@ def start_web_werver(port, listen, debug, config_file, db_file):
         print("Cannot start webapp server", file=sys.stderr)
 
 def init_pcd():
-    config_dir = os.path.join(os.environ["HOME"], ".config", "podcast-downloader")
+    config_dir = os.path.join(os.path.expanduser('~'), ".config", "podcast-downloader")
     config_file = os.path.join(config_dir, "podcast-downloader.cfg") # Not used, for compatibility with very early version
     db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
 
@@ -295,7 +295,7 @@ def proxy(url_to_call):
             raise "Not a RSS"
         elif checkfeed["feed"]["title"] is None or checkfeed["feed"]["title"] == "":
             raise "Not a RSS"
-        
+
     except:
         # Not an RSS, check if json
         try:
@@ -305,7 +305,7 @@ def proxy(url_to_call):
             # This reduces the array of attack if the website is worldwide accessible
             # and someone tries to use it as a HTTPx proxy
             raise "Invalid data! Use only for RSS or json api!"
-    
+
     resp = Response(content)
     resp.headers["Access-Control-Allow-Origin"] = "Same-Origin"
 
