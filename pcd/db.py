@@ -136,12 +136,12 @@ def migrate_db(self):
 
     con.close()
 
-def get_data(db_file, query):
+def get_data(db_file, query, params={}):
     con = sqlite3.connect(db_file)
     con.row_factory = sqlite3.Row
     curs = con.cursor()
 
-    curs.execute(query)
+    curs.execute(query, params)
 
     data = curs.fetchall()
     curs.close()
@@ -181,8 +181,8 @@ def web_history(self):
                    h.image_cache
             FROM podcast p INNER JOIN
                  downloaded h ON h.uuid = p.uuid
-            WHERE p.name = '__NAME__'
-            ORDER BY p.name""".replace("__NAME__", podcast["podcast_name"].replace("'", "''")))
+            WHERE p.name = :podcast_name
+            ORDER BY p.name""", {'podcast_name': podcast["podcast_name"]})
 
     return data
 
@@ -191,7 +191,7 @@ def web_podcast_detail(self, id):
     con.row_factory = sqlite3.Row
     curs = con.cursor()
 
-    curs.execute("SELECT * FROM podcast WHERE id = ?", [(id)])
+    curs.execute("SELECT * FROM podcast WHERE id = :id", {id})
 
     row = curs.fetchone()
 
