@@ -12,12 +12,10 @@ def delete(self, id):
     con = sqlite3.connect(self.db_file)
     curs = con.cursor()
 
-    curs.execute("DELETE FROM podcast WHERE id = ? OR uuid = ?", (id, id))
+    curs.execute("DELETE FROM podcast WHERE id = :id OR uuid = id", { 'id': id })
     if curs.rowcount > 0:
         print (id + " deleted successfully")
     else:
         print (id + " not found")
     con.commit()
     con.close()
-    
-

@@ -43,7 +43,7 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
     curs.execute("""SELECT uuid, url, name, min_size, max_size,
                             destination, min_duration, max_duration, published_time_before, published_time_after,
                             include, exclude, download_days, image, description
-                 FROM podcast WHERE ? IS NULL AND enabled = 1 OR CAST(? AS VARCHAR(36)) IN (CAST(id AS VARCHAR(36)), uuid)""", (dl_id, str(dl_id)))
+                 FROM podcast WHERE :dl_id IS NULL AND enabled = 1 OR CAST(:dl_id_str AS VARCHAR(36)) IN (CAST(id AS VARCHAR(36)), uuid)""", {'dl_id': dl_id, 'dl_id_str': str(dl_id)})
 
     data = curs.fetchall()
 
@@ -87,13 +87,13 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
                 print("Cannot download image", file=sys.stderr)
                 iamge_data = None
 
-            curs.execute("UPDATE podcast SET image = ?, image_cache = ? WHERE uuid = ?", (image, image_data, uuid))
+            curs.execute("UPDATE podcast SET image = :image, image_cache = :image_data WHERE uuid = :uuid", {'image': image, 'image_data': image_data, 'uuid': uuid})
             con.commit()
 
         if description != rss["feed"]["description"]:
             desciption = rss["feed"]["description"]
 
-            curs.execute("UPDATE podcast SET description = ? WHERE uuid = ?", (desciption, uuid))
+            curs.execute("UPDATE podcast SET description = :description WHERE uuid = :uuid", {'desciption': desciption, 'uuid': uuid})
             con.commit()
 
         for entry in rss.entries:
@@ -170,7 +170,7 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
 
                     con = sqlite3.connect(db_file)
                     curs = con.cursor()
-                    curs.execute("SELECT count(*) FROM downloaded WHERE uuid = ? AND url = ?", (uuid, href))
+                    curs.execute("SELECT count(*) FROM downloaded WHERE uuid = :uuid AND url = :href", {'uuid': uuid, 'href': href})
 
                     if curs.fetchone()[0] == 0 or dl_url is not None:
                         if do_download == True:
@@ -197,10 +197,10 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
                                 print("Cannot download image", file=sys.stderr)
 
                             curs.execute("""INSERT INTO downloaded (uuid, url, name, dl_time, publish_time, description, external_link, image, image_cache)
-                                         SELECT ?, ?, ?, current_timestamp, ?, ?, ?, ?, ?
-                                         WHERE NOT EXISTS (SELECT 1 FROM downloaded WHERE uuid = ? and url = ?)""",
-                                         (uuid, href, title, date_published, description, extrenal_link, image, image_data,
-                                          uuid, href))
+                                         SELECT :uuid, :href, :title, current_timestamp, :date_published, :description, :extrenal_link, :image, :image_data
+                                         WHERE NOT EXISTS (SELECT 1 FROM downloaded WHERE uuid = :uuid and url = :href)""",
+                                         {'uuid': uuid, 'href': href, 'title': title, 'date_published': date_published, 'description': description,
+                                          'extrenal_link': extrenal_link, 'image': image, 'image_data': image_data})
 
                             con.commit()
 

@@ -29,7 +29,7 @@ def edit(self, uuid, key, value, flask_update = False):
 
     con = sqlite3.connect(self.db_file)
     curs = con.cursor()
-    curs.execute("UPDATE podcast SET " + key + " = ? WHERE uuid = ? OR id = ?", (value, uuid, uuid))
+    curs.execute("UPDATE podcast SET " + key + " = :value WHERE uuid = :uuid OR id = :uuid", {'value': value, 'uuid': uuid})
     rc = curs.rowcount
     con.commit()
     con.close()

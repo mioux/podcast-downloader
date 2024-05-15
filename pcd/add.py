@@ -41,15 +41,16 @@ def add(self, url = "", name = "", min_size = None, max_size = None,
                 uuid, name, url, min_size, max_size,
                 destination, min_duration, max_duration, published_time_before, published_time_after,
                 enabled, include, exclude, download_days
-            )
-            VALUES (
-                ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?,
-                ?, ?, ?, ?)""", (
-                    add_uuid, name, url, min_size, max_size,
-                    destination, min_duration, max_duration, published_time_before, published_time_after,
-                    enabled, include, exclude, download_days
-                ))
+        )
+        VALUES (
+                :add_uuid, :name, :url, :min_size, :max_size,
+                :destination, :min_duration, :max_duration, :published_time_before, :published_time_after,
+                :enabled, :include, :exclude, :download_days)""",
+            {
+                'add_uuid': add_uuid, 'name': name, 'url': url, 'min_size': min_size, 'max_size': max_size,
+                'destination': destination, 'min_duration': min_duration, 'max_duration': max_duration, 'published_time_before': published_time_before, 'published_time_after': published_time_after,
+                'enabled': enabled, 'include': include, 'exclude': exclude, 'download_days': download_days
+            })
 
         print (add_uuid + " (" + name + ") added successfully")
 
