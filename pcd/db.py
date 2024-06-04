@@ -191,7 +191,7 @@ def web_podcast_detail(self, id):
     con.row_factory = sqlite3.Row
     curs = con.cursor()
 
-    curs.execute("SELECT * FROM podcast WHERE id = :id", {id})
+    curs.execute("SELECT * FROM podcast WHERE id = :id", {'id': id})
 
     row = curs.fetchone()
 

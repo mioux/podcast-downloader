@@ -24,8 +24,8 @@ def add(self, url = "", name = "", min_size = None, max_size = None,
 
     if add_uuid is None: add_uuid = str(uuid.uuid4())
 
-    if url == "" or name == "":
-        add_usage()
+    if url == "" or name == "" or url is None or name is None:
+        self.add_usage()
         return ""
     else:
         con = sqlite3.connect(self.db_file)

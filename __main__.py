@@ -4,6 +4,7 @@ import os, sys, validators
 from pcd import pcd
 from pprint import pprint
 from web import web
+import argparse
 
 config_dir = os.path.join(os.path.expanduser('~'), ".config", "podcast-downloader")
 config_file = os.path.join(config_dir, "podcast-downloader.cfg") # Not used, for compatibility with very early version
@@ -14,6 +15,9 @@ _pcd = pcd.pcd(config_file=config_file, db_file=db_file)
 exe_name = os.path.basename(sys.argv[0])
 
 def stringToIntDays(dayList = "") -> int:
+    if dayList is None:
+        return 127
+
     check_days = dayList.lower().replace(" ", "").split(",")
     download_days = 0
     if "mon" in check_days:
@@ -51,146 +55,69 @@ _pcd.migrate_db()
 
 argc = len(sys.argv)
 
-if len(sys.argv) == 1 or sys.argv[1].lower() == "download":
-    if argc > 1 and sys.argv[2].lower() == "help":
+parser = argparse.ArgumentParser(prog=exe_name, description="Simple podcast downloader")
+parser.add_argument("command", help="Command", action="store", choices=["download", "add", "edit", "delete", "list", "dump-config", "dump", "web", "help"], default="download", nargs="?")
+parser.add_argument("help", help="Show help for command", choices=["help"], nargs="?")
+parser.add_argument("--id", action="store", help="Id of podcast (nuremic format)")
+parser.add_argument("--uuid", action="store", help="Id of podcast (UUID format)")
+parser.add_argument("--name", action="store", help="Name of the podcast")
+parser.add_argument("--url", action="store", help="URL of podcast")
+parser.add_argument("--destination", action="store", help="Destination of files on hard disk")
+parser.add_argument("--min-size", action="store", help="Minimum size of file to download (in MB)", type=int)
+parser.add_argument("--max-size", action="store", help="Maximum size of file to download (in MB)", type=int)
+parser.add_argument("--min-duration", action="store", help="Minimum duration (in s)", type=int)
+parser.add_argument("--max-duration", action="store", help="Maximum duration (in s)", type=int)
+parser.add_argument("--published-time-before", action="store", help="Published before (HHmmss format)", type=int, choices=range(0, 240000), metavar="HHmmss")
+parser.add_argument("--published-time-after", action="store", help="Published after (HHmmss format)", type=int, choices=range(0, 240000), metavar="HHmmss")
+parser.add_argument("--include", action="store", help="Include titles containing (regex)")
+parser.add_argument("--exclude", action="store", help="Exclude titles containing (regex)")
+parser.add_argument("--days", action="store", help="days of download (empty=all, [mon,tue,wed,thu,fri,sat,sun] )")
+parser.add_argument("--enabled", action="store", help="Enable download", choices=["0", "off", "no", "false", "disable", "disabled", "1", "on", "yes", "enabled", "enable", "true"])
+parser.add_argument("--port", action="store", help="Port to listen on. Admin privileges needed for ports < 1024", type=int, choices=range(1, 65535), default=8000, metavar="[1,65534]")
+parser.add_argument("--listen", action="store", help="Listen on IP", default="127.0.0.1")
+parser.add_argument("--debug", action="store", help="Debug web server", choices=["0", "off", "no", "false", "1", "on", "yes", "debug", "true"])
+
+args = parser.parse_args()
+
+if args.command == "download":
+    if args.help == "help":
         _pcd.add_usage()
     else:
-        dl_id = None
-        dl_url = None
-
-        for i in range(2, argc):
-            if sys.argv[i][0:5] == "--id=":
-                dl_id = sys.argv[i][5:]
-            if sys.argv[i][0:7] == "--uuid=":
-                dl_id = sys.argv[i][7:]
-            if sys.argv[i][0:6] == "--url=":
-                dl_url = sys.argv[i][6:]
-
-        _pcd.dl(dl_url=dl_url, dl_id=dl_id)
+        _pcd.dl(dl_url=args.uuid, dl_id=args.id)
 
     sys.exit(0)
 
-if sys.argv[1].lower() == "add":
-    if argc == 2 or sys.argv[2].lower() == "help":
+if args.command == "add":
+    if args.help == "help":
         _pcd.add_usage()
     else:
-        url = None
-        name = None
-        min_size = None
-        max_size = None
-        destination = None
-        min_duration = None
-        max_duration = None
-        published_time_after = None
-        published_time_before = None
-        include = None
-        exclude = None
+        url = args.url if args.url is not None and validators.url(args.url) == True else None
         download_days = 127
 
-        for i in range(2, argc):
-            if sys.argv[i][0:6] == "--url=" and validators.url(sys.argv[i][6:]) == True:
-                url = sys.argv[i][6:]
-            if sys.argv[i][0:7] == "--name=":
-                name = sys.argv[i][7:]
-            if sys.argv[i][0:11] == "--min-size=":
-                min_size = int(sys.argv[i][11:])
-            if sys.argv[i][0:11] == "--max-size=":
-                max_size = int(sys.argv[i][11:])
-            if sys.argv[i][0:14] == "--destination=":
-                destination = sys.argv[i][14:]
-            if sys.argv[i][0:15] == "--min-duration=":
-                min_duration = int(sys.argv[i][15:])
-            if sys.argv[i][0:15] == "--max-duration=":
-                max_duration = int(sys.argv[i][15:])
-            if sys.argv[i][0:24] == "--published-time-before=":
-                published_time_before = int(sys.argv[i][24:])
-                if published_time_before > 240000:
-                    published_time_before = 240000
-                if published_time_before < 0:
-                    published_time_before = 0
-            if sys.argv[i][0:23] == "--published-time-after=":
-                published_time_after = int(sys.argv[i][23:])
-                if published_time_after > 240000:
-                    published_time_after = 240000
-                if published_time_after < 0:
-                    published_time_after = 0
-            if sys.argv[i][0:10] == "--include=":
-                include = sys.argv[i][10:]
-            if sys.argv[i][0:10] == "--exclude=":
-                exclude = sys.argv[i][10:]
-            if sys.argv[i][0:7] == "--days=":
-                download_days = stringToIntDays(sys.argv[i][7:])
+        if args.days != "":
+            download_days = stringToIntDays(args.days)
 
-        _pcd.add(url = url, name = name, min_size = min_size, max_size = max_size, destination = destination,
-                 min_duration = min_duration, max_duration = max_duration, published_time_before = published_time_before,
-                 published_time_after = published_time_after, include = include, exclude = exclude, download_days = download_days)
+        _pcd.add(url = args.url, name = args.name, min_size = args.min_size, max_size = args.max_size, destination = args.destination,
+                 min_duration = args.min_duration, max_duration = args.max_duration, published_time_before = args.published_time_before,
+                 published_time_after = args.published_time_after, include = args.include, exclude = args.exclude, download_days = download_days)
 
-elif sys.argv[1].lower() == "delete":
-    if argc == 2 or sys.argv[2].lower() == "help":
+elif args.command == "delete":
+    if args.help == "help":
         _pcd.delete_usage()
     else:
-        id = ""
-        for i in range(2, argc):
-            if sys.argv[i][0:5] == "--id=":
-                id = sys.argv[i][5:]
+        _pcd.delete(args.id)
 
-        if id == "":
-            _pcd.delete_usage()
-        else:
-            _pcd.delete(id)
-elif sys.argv[1].lower() == "edit":
-    url = None
-    name = None
-    min_size = None
-    max_size = None
-    min_duration = None
-    max_duration = None
-    published_time_before = None
-    published_time_after = None
-    edit_uuid = None
-    destination = None
-    enabled = None
-    include = None
-    exclude = None
+elif args.command == "edit":
+    url = args.url if args.url is not None and validators.url(args.url) == True else None
     download_days = None
 
-    for i in range(2, argc):
-        if sys.argv[i][0:5] == "--id=":
-            edit_uuid = sys.argv[i][5:]
-        if sys.argv[i][0:6] == "--url=" and validators.url(sys.argv[i][6:]) == True:
-            url = sys.argv[i][6:]
-        if sys.argv[i][0:7] == "--name=":
-            name = sys.argv[i][7:]
-        if sys.argv[i][0:11] == "--min-size=":
-            min_size = int(sys.argv[i][11:])
-        if sys.argv[i][0:11] == "--max-size=":
-            max_size = int(sys.argv[i][11:])
-        if sys.argv[i][0:14] == "--destination=":
-            destination = sys.argv[i][14:]
-        if sys.argv[i][0:15] == "--min-duration=":
-            min_duration = sys.argv[i][15:]
-        if sys.argv[i][0:15] == "--max-duration=":
-            max_duration = sys.argv[i][15:]
-        if sys.argv[i][0:24] == "--published-time-before=":
-            published_time_before = int(sys.argv[i][24:])
-            if published_time_before > 240000:
-                published_time_before = 240000
-            if published_time_before < 0:
-                published_time_before = 0
-        if sys.argv[i][0:23] == "--published-time-after=":
-            published_time_after = int(sys.argv[i][23:])
-            if published_time_after > 240000:
-                published_time_after = 240000
-            if published_time_after < 0:
-                published_time_after = 0
-        if sys.argv[i][0:10] == "--enabled=":
-            enabled = sys.argv[i][10:] != "0" and sys.argv[i][10:] != ""
-        if sys.argv[i][0:10] == "--include=":
-            include = sys.argv[i][10:]
-        if sys.argv[i][0:10] == "--exclude=":
-            exclude = sys.argv[i][10:]
-        if sys.argv[i][0:7] == "--days=":
-            download_days = stringToIntDays(sys.argv[i][7:])
+    if args.days != "":
+        download_days = stringToIntDays(args.days)
+
+    edit_uuid = args.id if args.id is not None else args.url_id
+
+    if args.enabled is not None:
+        enabled = (args.enabled in ["1", "on", "yes", "enabled", "enable", "true"])
 
     if edit_uuid is None:
         _pcd.edit_usage()
@@ -198,28 +125,28 @@ elif sys.argv[1].lower() == "edit":
         changed = False
         if url is not None:
             changed = _pcd.edit(edit_uuid, "url", url) or changed
-        if name is not None:
-            changed = _pcd.edit(edit_uuid, "name", name) or changed
-        if min_size is not None:
-            changed = _pcd.edit(edit_uuid, "min_size", int(min_size)) or changed
-        if max_size is not None:
-            changed = _pcd.edit(edit_uuid, "max_size", int(max_size)) or changed
-        if min_duration is not None:
-            changed = _pcd.edit(edit_uuid, "min_duration", int(min_duration)) or changed
-        if max_duration is not None:
-            changed = _pcd.edit(edit_uuid, "max_duration", int(max_duration)) or changed
-        if published_time_before is not None:
-            changed = _pcd.edit(edit_uuid, "published_time_before", int(published_time_before)) or changed
-        if published_time_after is not None:
-            changed = _pcd.edit(edit_uuid, "published_time_after", int(published_time_after)) or changed
-        if destination is not None:
-            changed = _pcd.edit(edit_uuid, "destination", destination) or changed
-        if enabled is not None:
+        if args.name is not None:
+            changed = _pcd.edit(edit_uuid, "name", args.name) or changed
+        if args.min_size is not None:
+            changed = _pcd.edit(edit_uuid, "min_size", args.min_size) or changed
+        if args.max_size is not None:
+            changed = _pcd.edit(edit_uuid, "max_size", args.max_size) or changed
+        if args.min_duration is not None:
+            changed = _pcd.edit(edit_uuid, "min_duration", args.min_duration) or changed
+        if args.max_duration is not None:
+            changed = _pcd.edit(edit_uuid, "max_duration", args.max_duration) or changed
+        if args.published_time_before is not None:
+            changed = _pcd.edit(edit_uuid, "published_time_before", args.published_time_before) or changed
+        if args.published_time_after is not None:
+            changed = _pcd.edit(edit_uuid, "published_time_after", args.published_time_after) or changed
+        if args.destination is not None:
+            changed = _pcd.edit(edit_uuid, "destination", args.destination) or changed
+        if args.enabled is not None:
             changed = _pcd.edit(edit_uuid, "enabled", enabled) or changed
-        if include is not None:
-            changed = _pcd.edit(edit_uuid, "include", include) or changed
-        if exclude is not None:
-            changed = _pcd.edit(edit_uuid, "exclude", exclude) or changed
+        if args.include is not None:
+            changed = _pcd.edit(edit_uuid, "include", args.include) or changed
+        if args.exclude is not None:
+            changed = _pcd.edit(edit_uuid, "exclude", args.exclude) or changed
         if download_days is not None:
             changed = _pcd.edit(edit_uuid, "download_days", download_days) or changed
 
@@ -228,16 +155,16 @@ elif sys.argv[1].lower() == "edit":
         else:
             print (edit_uuid + " : no changes were made")
 
-elif sys.argv[1].lower() == "list":
-    if argc == 3 and sys.argv[2].lower() == "help":
+elif args.command == "list":
+    if args.help == "help":
         print ("Usage: " + exe_name + " list")
     else:
         data = _pcd.podcast_list()
         for line in data:
             print(line["pc_detail"])
-elif sys.argv[1].lower() == "dump-config" or sys.argv[1].lower() == "dump" :
-    if argc == 3 and sys.argv[2].lower() == "help":
-        print ("Usage: " + exe_name + " " + sys.argv[1].lower())
+elif args.command == "dump-config" or args.command == "dump" :
+    if args.help == "help":
+        print ("Usage: " + exe_name + " " + args.command)
     else:
         data = _pcd.config_dump()
 
@@ -251,28 +178,20 @@ elif sys.argv[1].lower() == "dump-config" or sys.argv[1].lower() == "dump" :
                     js_data[line["uuid"]][h] = line[h]
         pprint(js_data)
 
-elif sys.argv[1].lower() == "web":
-    if argc > 2 and sys.argv[2].lower() == "help":
+elif args.command == "web":
+    if args.help == "help":
         web.web_usage()
     else:
-        port="8000"
-        listen="127.0.0.1"
         debug=False
-        for i in range(2, argc):
-            if sys.argv[i][0:7] == "--port=":
-                port = sys.argv[i][7:]
-            if sys.argv[i][0:9] == "--listen=":
-                listen = sys.argv[i][9:]
-            if sys.argv[i][0:8] == "--debug=":
-                debug_str = sys.argv[i][8:]
-                if debug_str == "1" or debug_str.lower() == "on" or debug_str.lower() == "yes" or debug_str.lower() == "true":
-                    debug = True
+        if args.debug is not None:
+            if args.debug == "1" or args.debug == "on" or args.debug == "yes" or args.debug == "true" or args.debug == "debug":
+                debug = True
 
-        web.start_web_werver(port, listen, debug, config_file, db_file)
+        web.start_web_werver(args.port, args.listen, debug, config_file, db_file)
 
 else:
     main_usage()
-    if sys.argv[1].lower() == "help":
+    if args.command == "help":
         sys.exit(0)
     else:
         sys.exit(1)
