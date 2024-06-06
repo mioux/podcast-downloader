@@ -52,12 +52,7 @@ def migrate_db(self):
 
         con.commit()
 
-        if exists(self.config_file):
-            config_data = open(self.config_file, mode="r")
-            config = json.loads(config_data.read())
-            config_data.close()
-        else:
-            config = json.loads("{ }")
+        config = { }
 
         for key in config:
             url = config[key].get("url", "")

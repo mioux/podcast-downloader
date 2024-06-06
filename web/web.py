@@ -28,9 +28,9 @@ def web_usage():
     print ("    --listen=<ip or URL to listen>: Set IP/URL to listen on (not validated, be sure of your value)")
     print ("    --debug=[1|ON|YES|TRUE]       : ")
 
-def start_web_werver(port, listen, debug, config_file, db_file):
+def start_web_werver(port, listen, debug, db_file):
 
-    _pcd = pcd.pcd(config_file, db_file)
+    _pcd = pcd.pcd(db_file)
     _pcd.migrate_db()
 
     try:
@@ -52,10 +52,9 @@ def start_web_werver(port, listen, debug, config_file, db_file):
 
 def init_pcd():
     config_dir = os.path.join(os.path.expanduser('~'), ".config", "podcast-downloader")
-    config_file = os.path.join(config_dir, "podcast-downloader.cfg") # Not used, for compatibility with very early version
     db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
 
-    return pcd.pcd(config_file, db_file)
+    return pcd.pcd(db_file)
 
 
 template_folder = os.path.join(os.path.dirname(__file__), "templates")

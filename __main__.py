@@ -7,10 +7,9 @@ from web import web
 import argparse
 
 config_dir = os.path.join(os.path.expanduser('~'), ".config", "podcast-downloader")
-config_file = os.path.join(config_dir, "podcast-downloader.cfg") # Not used, for compatibility with very early version
 db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
 
-_pcd = pcd.pcd(config_file=config_file, db_file=db_file)
+_pcd = pcd.pcd(db_file=db_file)
 
 exe_name = os.path.basename(sys.argv[0])
 
@@ -187,7 +186,7 @@ elif args.command == "web":
             if args.debug == "1" or args.debug == "on" or args.debug == "yes" or args.debug == "true" or args.debug == "debug":
                 debug = True
 
-        web.start_web_werver(args.port, args.listen, debug, config_file, db_file)
+        web.start_web_werver(args.port, args.listen, debug, db_file)
 
 else:
     main_usage()
