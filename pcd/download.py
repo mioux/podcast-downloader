@@ -78,6 +78,8 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
         else:
             image = ""
 
+        image_data = None
+
         if image != last_image and image != "":
             try:
                 image_data = get_image(image)
