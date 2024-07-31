@@ -73,7 +73,11 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
 
         print("Checking {name} ({uuid})".format(name=name, uuid=uuid))
 
-        image = rss["feed"]["image"]["href"]
+        if rss["feed"]["image"] is not None:
+            image = rss["feed"]["image"]["href"]
+        else:
+            image = ""
+
         if image != last_image and image != "":
             try:
                 image_data = get_image(image)
