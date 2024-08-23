@@ -30,9 +30,13 @@ def get_extension(path):
         return extension
     return extension[:http_params_position]
 
+def format_filename(filename, remove_special_chars=True, replace_slashes=True):
 
-def format_filename(filename):
-    return filename.replace("/", "_").replace(":", "_").replace("\\", "_").replace("*", "_").replace("?", "_").replace("\"", "''")
+    filename = re.sub(r'[/\\:#?<>|]', '_', filename)
+    filename = filename.replace("\"", "''")
+
+    return filename
+
 
 def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
     print("Start downloading process")
@@ -93,7 +97,7 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
         if description != rss["feed"]["description"]:
             desciption = rss["feed"]["description"]
 
-            curs.execute("UPDATE podcast SET description = :description WHERE uuid = :uuid", {'desciption': desciption, 'uuid': uuid})
+            curs.execute("UPDATE podcast SET description = :description WHERE uuid = :uuid", {'desciption': description, 'uuid': uuid})
             con.commit()
 
         for entry in rss.entries:
