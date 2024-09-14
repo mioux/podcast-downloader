@@ -101,7 +101,7 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
             con.commit()
 
         if description != rss["feed"]["description"]:
-            desciption = rss["feed"]["description"]
+            description = rss["feed"]["description"]
 
             curs.execute("UPDATE podcast SET description = :description WHERE uuid = :uuid", {'description': description, 'uuid': uuid})
             con.commit()
