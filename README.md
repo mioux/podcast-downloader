@@ -37,9 +37,9 @@ You need these packages to have this script work. Install it either via your dis
 - dateutil
 - Pillow
 
-Example for Fedora 35:
+Example for Fedora 40:
 
-    sudo dnf install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil python3-willow
+    sudo dnf install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil python3-willow python3-pillow
     pip install datefinder
 
 Example for Debian 11:
