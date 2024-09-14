@@ -6,6 +6,50 @@
 {% block inpagetitle %}History{% endblock %}
 
 {% block content %}
+  <script language="javascript">
+    function mus_play(podcast, title, url)
+    {
+      $('#mus_podcast').text(podcast);
+      $('#mus_title').text(title);
+
+      var audio = $('#mus_file');
+      audio.attr("src", url);
+      audio[0].pause();
+      audio[0].load();
+      audio[0].oncanplaythrough = audio[0].play();
+
+      $("#mus_play").hide();
+      $("#mus_pause").show();
+    }
+
+    function play_btn()
+    {
+      $("#mus_play").hide();
+      $("#mus_pause").show();
+      $('#mus_file')[0].play();
+    }
+
+    function pause_btn()
+    {
+      $("#mus_play").show();
+      $("#mus_pause").hide();
+      $('#mus_file')[0].pause();
+    }
+
+    function update_time()
+    {
+      curTime = new Date(null);
+      duration = new Date(null);
+
+      curTime.setSeconds($('#mus_file')[0].currentTime);
+      duration.setSeconds($('#mus_file')[0].duration);
+
+
+
+      $("#mus_current_time").text(curTime.toISOString().substr(11, 8));
+      $("#mus_total_time").text(duration.toISOString().substr(11, 8));
+    }
+  </script>
   <div>
     <div class="accordion" id="podcast-list">
       {% for name in history["_"] %}
@@ -26,6 +70,7 @@
                 <th scope="col">Downloaded</th>
                 <th scope="col"><i class="bi bi-download"></i></th>
                 <th scope="col"><i class="bi bi-cloud-download"></i></th>
+                <th scope="col"><i class="bi bi-play-circle"></i></th>
               </tr>
             </thead>
             <tbody>
@@ -38,6 +83,7 @@
                   <td class="align-middle">{{ h["dl_time"] }}</td>
                   <td class="align-middle"><a href="{{ h["url"] }}"><i class="bi bi-download"></i></a></td>
                   <td class="align-middle"><a href="{{ url_for("downloadItem", dl_id=h["id"]|int, dl_url=h["url"]|str32encode) }}"><i class="bi bi-cloud-download"></i></a></td>
+                  <td class="align-middle"><a onclick='javascript:mus_play({{ name["podcast_name"]|tojson|safe }}, {{ h["name"]|tojson|safe }}, {{ h["url"]|tojson|safe }})'><i class="bi bi-play-circle"></i></a></td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -46,8 +92,38 @@
       </div>
       {% endfor %}
     </div>
+    <div style="height: 196px;">
+      &nbsp;
+    </div>
   </div>
+  <!-- Content -->
+  <div class="fixed-bottom container w-100">
+
+    <div id="mobile-box">
+
+      <!-- Card -->
+      <div class="card">
+        <div class="card-body text-center">
+          <h5 class="h5 font-weight-bold" id="mus_podcast">No podcast</h5>
+          <p class="mb-0" id="mus_title">No title</p>
+
+          <audio id="mus_file" preload="true" ontimeupdate="javascript:update_time()">
+            <source src="">
+          </audio>
+          <span id="mus_current_time"></span>
+          <i onclick="javascript:play_btn()" class="bi bi-play-circle" id="mus_play"></i>
+          <i onclick="javascript:pause_btn()" class="bi bi-pause-circle" id="mus_pause"></i>
+          <span id="mus_total_time"></span>
+        </div>
+      </div>
+      <!-- Card -->
+    </div>
+  </div>
+  <!-- Content -->
+
   <script>
     $(document).ready( function() { $('.table').DataTable(); });
+    $("#mus_play").hide();
+    $("#mus_pause").hide();
   </script>
 {% endblock %}
