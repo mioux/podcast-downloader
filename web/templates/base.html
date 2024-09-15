@@ -47,7 +47,7 @@
               <a class="nav-link{% if active == "edit" %} active{% endif %}" href="{{ url_for('edit', edit_id='new') }}">Add/Edit podcast</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link{% if active == "history" %} active{% endif %}" href="{{ url_for('history') }}">View download history</a>
+              <a class="nav-link{% if active == "history" %} active{% endif %}" href="{{ url_for('history') }}">View download history/player</a>
             </li>
             <li class="nav-item">
               <a class="nav-link{% if active == "dl" %} active{% endif %}" href="{{ url_for('download') }}">Force download</a>
