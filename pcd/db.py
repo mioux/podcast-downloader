@@ -173,7 +173,8 @@ def web_history(self):
                    h.description,
                    CASE WHEN h.external_link = '' THEN h.url ELSE h.external_link END AS external_link,
                    CASE WHEN download_days IS NULL THEN 127 ELSE download_days END AS download_days,
-                   h.image_cache
+                   h.image_cache,
+                   h.id AS history_id
             FROM podcast p INNER JOIN
                  downloaded h ON h.uuid = p.uuid
             WHERE p.name = :podcast_name

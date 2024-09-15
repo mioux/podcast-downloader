@@ -5,7 +5,7 @@ class pcd():
     from pcd.db import migrate_db, podcast_list, config_dump, web_list, web_history, web_podcast_detail
     from pcd.delete import delete, delete_usage
     from pcd.edit import edit, edit_usage
-    from pcd.download import dl
+    from pcd.download import dl, get_file
 
     def __init__(self, db_file) -> None:
         self.db_file = db_file

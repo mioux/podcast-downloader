@@ -22,7 +22,7 @@ You can configure the app through the web server. It uses internal python's web 
 
 There is a `podcast-downlader-web.bat` and a `podcast-downlader-web.sh` as helper to start web server
 
-A player is available in History. IT DOES NOT PLAY LOCALLY DOWNLOADED FILES ! IT LOADS THE DISTANT FILE !
+A player is available in History. Loads the local file if available (useful if it has been deleted from source), or redirects to origin URL if not downloaded/removed/renamed.
 
 ## Needed dependencies
 

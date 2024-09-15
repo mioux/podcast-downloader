@@ -1,10 +1,9 @@
 #!/bin/env python3
 
 import os, ctypes, sys, validators, base64, requests, feedparser, json
-from flask import Flask, render_template, redirect, session, request, Response
+from flask import Flask, render_template, redirect, session, request, Response, send_file
 from pcd import pcd
 from urllib.parse import unquote
-
 
 def dict_factory(cursor, row):
     d = {}
@@ -309,6 +308,15 @@ def proxy(url_to_call):
     resp.headers["Access-Control-Allow-Origin"] = "Same-Origin"
 
     return content.text
+
+@app.route('/getfile/<int:historyid>')
+def getfile(historyid):
+    _pcd = init_pcd()
+    file, url = _pcd.get_file(historyid)
+    if os.path.isfile(file):
+        return send_file(file)
+    else:
+        return redirect(url, code=302)
 
 @app.template_filter('b64encode')
 def b64encode(input):

@@ -96,7 +96,7 @@
                   <td class="align-middle">{{ h["dl_time"] }}</td>
                   <td class="align-middle"><a href="{{ h["url"] }}"><i class="bi bi-download"></i></a></td>
                   <td class="align-middle"><a href="{{ url_for("downloadItem", dl_id=h["id"]|int, dl_url=h["url"]|str32encode) }}"><i class="bi bi-cloud-download"></i></a></td>
-                  <td class="align-middle"><a onclick='javascript:mus_play({{ name["podcast_name"] | tojson | safe }}, {{ h["name" ] |tojson | safe }}, {{ h["url"] | tojson | safe }})'><i class="bi bi-play-circle"></i></a></td>
+                  <td class="align-middle"><a onclick='javascript:mus_play({{ name["podcast_name"] | tojson | safe }}, {{ h["name" ] | tojson | safe }}, {{ url_for("getfile", historyid=h["history_id"]) | tojson | safe }})'><i class="bi bi-play-circle"></i></a></td>
                 </tr>
               {% endfor %}
             </tbody>

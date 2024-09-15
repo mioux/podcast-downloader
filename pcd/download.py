@@ -37,6 +37,9 @@ def format_filename(filename, remove_special_chars=True, replace_slashes=True):
 
     return filename
 
+def get_file_name(href, destination, date_prefix, title):
+    file_extension = get_extension(href)
+    return os.path.join(destination, date_prefix + format_filename(title) + file_extension)
 
 def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
     print("Start downloading process")
@@ -184,8 +187,7 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
 
                     if curs.fetchone()[0] == 0 or dl_url is not None:
                         if do_download == True:
-                            file_extension = get_extension(href)
-                            file_dest = os.path.join(destination, date_prefix + format_filename(title) + file_extension)
+                            file_dest = get_file_name(href, destination, date_prefix, title)
                             print("Downloading: " + file_dest)
                             file_content = requests.get(href)
                             os.makedirs(destination, exist_ok=True)
@@ -214,3 +216,26 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
                             con.commit()
 
     print("Downloading done")
+
+def get_file(self, id:int):
+    con = sqlite3.connect(self.db_file, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+    curs = con.cursor()
+
+    curs.execute("""SELECT h.url AS href, p.destination, COALESCE(h.publish_time, h.dl_time) AS publish_time, h.name, p.name AS podcast_name
+                 FROM podcast p
+                 INNER JOIN downloaded h ON h.uuid = p.uuid
+                 WHERE h.id = :id""", {'id': id})
+
+    data = curs.fetchone()
+    if data is not None:
+        destination = data[1]
+        if destination == "":
+            destination = os.path.join(config_dir, format_filename(data[4]))
+
+        published_time = datetime.datetime.strptime(data[2], "%Y-%m-%d %H:%M:%S%z")
+
+        file = get_file_name(data[0], destination, published_time.strftime("%Y%m%d_%H%M%S - "), data[3])
+        url = data[0]
+        return file, url
+    else:
+        return None
