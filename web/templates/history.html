@@ -41,13 +41,26 @@
       curTime = new Date(null);
       duration = new Date(null);
 
-      curTime.setSeconds($('#mus_file')[0].currentTime);
-      duration.setSeconds($('#mus_file')[0].duration);
+      float_currentTime = $('#mus_file')[0].currentTime;
+      float_duration = $('#mus_file')[0].duration;
 
+      slider = $("#mus_timeslider");
+      slider.attr("max", float_duration);
+      slider.val(float_currentTime);
 
+      curTime.setSeconds(float_currentTime);
+      duration.setSeconds(float_duration);
 
-      $("#mus_current_time").text(curTime.toISOString().substr(11, 8));
-      $("#mus_total_time").text(duration.toISOString().substr(11, 8));
+      txt_curTime = (Math.round(float_currentTime / 3600)).toString() + curTime.toISOString().substr(13, 6);
+      txt_duration = (Math.round(float_duration / 3600)).toString() + duration.toISOString().substr(13, 6);
+
+      $("#mus_current_time").text(txt_curTime);
+      $("#mus_total_time").text(txt_duration);
+    }
+
+    function mus_setCurrentTime()
+    {
+      $('#mus_file')[0].currentTime = $("#mus_timeslider").val();
     }
   </script>
   <div>
@@ -83,7 +96,7 @@
                   <td class="align-middle">{{ h["dl_time"] }}</td>
                   <td class="align-middle"><a href="{{ h["url"] }}"><i class="bi bi-download"></i></a></td>
                   <td class="align-middle"><a href="{{ url_for("downloadItem", dl_id=h["id"]|int, dl_url=h["url"]|str32encode) }}"><i class="bi bi-cloud-download"></i></a></td>
-                  <td class="align-middle"><a onclick='javascript:mus_play({{ name["podcast_name"]|tojson|safe }}, {{ h["name"]|tojson|safe }}, {{ h["url"]|tojson|safe }})'><i class="bi bi-play-circle"></i></a></td>
+                  <td class="align-middle"><a onclick='javascript:mus_play({{ name["podcast_name"] | tojson | safe }}, {{ h["name" ] |tojson | safe }}, {{ h["url"] | tojson | safe }}, {{ h["localFile"] | tojson | safe }})'><i class="bi bi-play-circle"></i></a></td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -113,6 +126,7 @@
           <span id="mus_current_time"></span>
           <i onclick="javascript:play_btn()" class="bi bi-play-circle" id="mus_play"></i>
           <i onclick="javascript:pause_btn()" class="bi bi-pause-circle" id="mus_pause"></i>
+          <input type="range" class="form-range w-50" min="0" max="0" id="mus_timeslider" onclick="javascript:mus_setCurrentTime()" step="0.01">
           <span id="mus_total_time"></span>
         </div>
       </div>
