@@ -7,3 +7,5 @@ regex
 dateutils
 Pillow
 argparse
+flask-login
+bcrypt

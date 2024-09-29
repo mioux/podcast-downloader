@@ -1,7 +1,8 @@
 #!/bin/env python3
 
 from genericpath import exists
-import os, json, sqlite3, sys
+import os, json, sqlite3, sys, random
+import bcrypt
 
 def migrate_db(self):
     con = sqlite3.connect(self.db_file)
@@ -129,6 +130,15 @@ def migrate_db(self):
         con.commit()
         version = '8'
 
+    if version == '8':
+        str_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-!:;,?./§*µù%^¨$£&é'()-è_çà=~#[]|`@"
+        app_secret = ''.join(random.choice(str_chars) for i in range(128))
+        curs.execute("INSERT INTO config(configname, configvalue) VALUES ('APP_SECRET', :app_secret)", {'app_secret': app_secret})
+        curs.execute("UPDATE config SET configvalue = '9' WHERE configname = 'DB_VERSION';")
+        curs.execute("CREATE TABLE users (username VARCHAR(128) PRIMARY KEY, password varchar(128))")
+        con.commit()
+        version = '9'
+
     con.close()
 
 def get_data(db_file, query, params={}):
@@ -182,7 +192,7 @@ def web_history(self):
 
     return data
 
-def web_podcast_detail(self, id):
+def web_podcast_detail(self, id: int):
     con = sqlite3.connect(self.db_file)
     con.row_factory = sqlite3.Row
     curs = con.cursor()
@@ -200,3 +210,67 @@ def web_podcast_detail(self, id):
     con.close()
 
     return data
+
+def get_config(self, configname: str):
+    con = sqlite3.connect(self.db_file)
+    curs = con.cursor()
+    curs.execute("SELECT configvalue FROM config WHERE configname = :configname", {'configname': configname})
+
+    data = None
+
+    row = curs.fetchone()
+    if row is not None:
+        data = str(row[0])
+
+    return data
+
+def check_user(self, username, password: str):
+    con = sqlite3.connect(self.db_file)
+    curs =  con.cursor()
+    curs.execute("SELECT password FROM users WHERE username = :username", {'username': username})
+
+    is_valid = False
+    row = curs.fetchone()
+    if row is not None:
+        hash_password = row[0]
+        is_valid = bcrypt.checkpw(password.encode(), hash_password)
+
+    con.close()
+    return is_valid
+
+def set_user_password(self, username: str, password: str):
+    SQL = "UPDATE users SET password = :hashed_passord WHERE username = :username" if user_exists(self, username) else "INSERT INTO users(username, password) VALUES(:username, :hashed_passord)"
+
+    con = sqlite3.connect(self.db_file)
+    curs = con.cursor()
+    curs.execute(SQL, {'username': username,
+                        'hashed_passord': bcrypt.hashpw(password.encode(), bcrypt.gensalt(12))
+                        })
+    con.commit()
+    con.close()
+
+def get_nb_users(self):
+    con = sqlite3.connect(self.db_file)
+    curs = con.cursor()
+    curs.execute("SELECT COUNT(*) FROM users")
+    data = curs.fetchone()[0]
+    con.close()
+    return data
+
+def delete_user(self, username: str):
+    con = sqlite3.connect(self.db_file)
+    curs = con.cursor()
+    curs.execute("DELETE FROM users WHERE username = :username", {'username': username})
+    con.commit()
+    con.close()
+
+def user_exists(self, username):
+    con = sqlite3.connect(self.db_file)
+    curs = con.cursor()
+    curs.execute("SELECT 1 FROM users WHERE username = :username", {'username': username})
+
+    row = curs.fetchone()
+    if row is not None:
+        return True
+    else:
+        return False

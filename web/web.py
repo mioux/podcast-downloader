@@ -1,9 +1,10 @@
 #!/bin/env python3
 
-import os, ctypes, sys, validators, base64, requests, feedparser, json
-from flask import Flask, render_template, redirect, session, request, Response, send_file
+import os, ctypes, sys, validators, base64, requests, feedparser, json, flask_login
+from flask import Flask, render_template, redirect, session, request, Response, send_file, url_for
 from pcd import pcd
 from urllib.parse import unquote
+
 
 def dict_factory(cursor, row):
     d = {}
@@ -55,6 +56,7 @@ def init_pcd():
 
     return pcd.pcd(db_file)
 
+_pcd = init_pcd()
 
 template_folder = os.path.join(os.path.dirname(__file__), "templates")
 template_folder = os.path.realpath(template_folder)
@@ -67,34 +69,67 @@ app = Flask("Podcast downloader webapp control",
                 template_folder=template_folder,
                 static_folder=static_folder)
 
+app.secret_key = _pcd.get_config("APP_SECRET")
+
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+
+class User(flask_login.UserMixin):
+    pass
+
+@login_manager.user_loader
+def user_loader(username):
+    if _pcd.user_exists(username) == False:
+        return
+
+    user = User()
+    user.id = username
+    return user
+
+@login_manager.request_loader
+def request_loader(request):
+    username = request.form.get('username')
+    if _pcd.user_exists(username) == False:
+        return
+
+    user = User()
+    user.id = username
+    return user
+
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    return 'Unauthorized', 401
+
+@app.route('/logout')
+def logout():
+    flask_login.logout_user()
+    return redirect(url_for("login"), code=301)
+
 @app.route('/')
 def index():
-    return redirect("/list", code=302)
+    return redirect(url_for("list"), code=302)
 
 @app.route('/delete/<string:delete_id>', methods = ['GET', 'POST'])
+@flask_login.login_required
 def delete(delete_id):
-
-    _pcd = init_pcd()
     podcast = _pcd.web_podcast_detail(delete_id)
 
     if request.method == "POST":
         delete_id = request.form["delete_id"]
         _pcd.delete(delete_id)
-        return redirect("/list", code=302)
+        return redirect(url_for("list"), code=302)
 
     if podcast is None:
-        return redirect("/list", code=302)
+        return redirect(url_for("list"), code=302)
 
     return render_template('delete.html', name=podcast["name"], delete_id=podcast["id"])
 
 @app.route('/edit/<string:edit_id>', methods=['GET', 'POST'])
+@flask_login.login_required
 def edit(edit_id):
-
     data = None
     is_new = 0
     found = 1
-
-    _pcd = init_pcd()
 
     if edit_id == "new":
         is_new = 1
@@ -148,7 +183,7 @@ def edit(edit_id):
                      max_size=max_size, min_duration=min_duration, max_duration=max_duration,
                      published_time_before=published_time_before_int, published_time_after=published_time_after_int, destination=destination,
                      enabled=enabled, include=include, exclude=exclude, download_days = download_days)
-            return redirect("/list", code=302)
+            return redirect(url_for("list"), code=302)
         elif valid == True:
             _pcd.edit(uuid=id, key="name", value=name, flask_update=True)
             _pcd.edit(uuid=id, key="url", value=url, flask_update=True)
@@ -163,7 +198,7 @@ def edit(edit_id):
             _pcd.edit(uuid=id, key="include", value=include, flask_update=True)
             _pcd.edit(uuid=id, key="exclude", value=exclude, flask_update=True)
             _pcd.edit(uuid=id, key="download_days", value=download_days, flask_update=True)
-            return redirect("/list", code=302)
+            return redirect(url_for("list"), code=302)
 
     else:
         data = None
@@ -256,33 +291,36 @@ def edit(edit_id):
                            total_days_value = total_days_value)
 
 @app.route('/list')
+@flask_login.login_required
 def list():
-    _pcd = init_pcd()
     podcast_list = _pcd.web_list()
     return render_template('list.html', podcast_list=podcast_list)
 
 @app.route('/history')
+@flask_login.login_required
 def history():
-    _pcd = init_pcd()
     history = _pcd.web_history()
     return render_template('history.html', history=history)
 
 @app.route('/downloadItem/<int:dl_id>/<string:dl_url>')
+@flask_login.login_required
 def downloadItem(dl_id, dl_url):
-    _pcd = init_pcd()
     _pcd.dl(dl_id=dl_id, dl_url=base64.b32decode(dl_url).decode("ascii") if dl_url is not None else None)
     return render_template('download.html')
 
 @app.route('/downloadPodcast/<int:dl_id>')
+@flask_login.login_required
 def downloadPodcast(dl_id):
     return downloadItem(dl_id, None)
 
 @app.route('/download')
+@flask_login.login_required
 def download():
     return downloadItem(None, None)
 
 
 @app.route('/proxy/<string:url_to_call>')
+@flask_login.login_required
 def proxy(url_to_call):
     url_to_call = unquote(url_to_call) # Need to decrypt double encoded URL
     content = requests.get(url_to_call)
@@ -310,13 +348,34 @@ def proxy(url_to_call):
     return content.text
 
 @app.route('/getfile/<int:historyid>')
+@flask_login.login_required
 def getfile(historyid):
-    _pcd = init_pcd()
     file, url = _pcd.get_file(historyid)
     if os.path.isfile(file):
         return send_file(file)
     else:
         return redirect(url, code=302)
+
+# Login page if not identified
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    failed_login = False
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if _pcd.check_user(username, password):
+            user = User()
+            user.id = username
+            flask_login.login_user(user)
+            return redirect(url_for("list"))
+        failed_login = True
+
+    return render_template('login.html', nb_users=_pcd.get_nb_users(), failed_login=failed_login)
+
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    return redirect(url_for("login"))
 
 @app.template_filter('b64encode')
 def b64encode(input):

@@ -36,20 +36,21 @@ You need these packages to have this script work. Install it either via your dis
 - regex
 - dateutil
 - Pillow
+- flask-login
 
 Example for Fedora 40:
 
-    sudo dnf install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil python3-willow python3-pillow
+    sudo dnf install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil python3-willow python3-pillow python3-flask-login python3-bcrypt
     pip install datefinder
 
 Example for Debian 11:
 
-    sudo apt install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil python3-willow
+    sudo apt install python3-requests python3-validators python3-feedparser python3-flask python3-regex python3-dateutil python3-willow python3-flask-login python3-bcrypt
     pip install datefinder
 
 All can be installed via pip:
 
-    pip install datefinder requests validators feedparser Flask regex dateutil Pillow
+    pip install datefinder requests validators feedparser Flask regex dateutil Pillow flask-login bcrypt
     #or
     pip install -r requirements.txt
 
@@ -134,3 +135,10 @@ All --id= paramteres can be either "id" or "uuid". UUID may disapear sometime. I
         --url=<url>        : Download only the file identified by the url (mostly used with the history tab)
                              WARNING: Forcing with URL don't apply regex filters
                              WARNING: URL MUST be available in current RSS feed. If your broadcaster removes the link from the feed, the podcast-downloader won't download it. You can still get the link in "downloaded" table
+
+### User help
+
+    Usage: podcast-downloader user --username=<username> [--password=<password>] [--delete]
+        --username=<username> : Username to create/modify/delete (update password if exists, create user if not)
+        --password=<password> : Optionnal password. Prompted if ommited. Cannot be used with --delete
+        --delete              : Delete username. Cannot be used with --password

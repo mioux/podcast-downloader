@@ -55,7 +55,7 @@ _pcd.migrate_db()
 argc = len(sys.argv)
 
 parser = argparse.ArgumentParser(prog=exe_name, description="Simple podcast downloader")
-parser.add_argument("command", help="Command", action="store", choices=["download", "add", "edit", "delete", "list", "dump-config", "dump", "web", "help"], default="download", nargs="?")
+parser.add_argument("command", help="Command", action="store", choices=["download", "add", "edit", "delete", "list", "dump-config", "dump", "web", "help", "user"], default="download", nargs="?")
 parser.add_argument("help", help="Show help for command", choices=["help"], nargs="?")
 parser.add_argument("--id", action="store", help="Id of podcast (nuremic format)")
 parser.add_argument("--uuid", action="store", help="Id of podcast (UUID format)")
@@ -75,6 +75,9 @@ parser.add_argument("--enabled", action="store", help="Enable download", choices
 parser.add_argument("--port", action="store", help="Port to listen on. Admin privileges needed for ports < 1024", type=int, choices=range(1, 65535), default=8000, metavar="[1,65534]")
 parser.add_argument("--listen", action="store", help="Listen on IP", default="127.0.0.1")
 parser.add_argument("--debug", action="store", help="Debug web server", choices=["0", "off", "no", "false", "1", "on", "yes", "debug", "true"])
+parser.add_argument("--username", action="store", help="Username to create/modify")
+parser.add_argument("--password", action="store", help="password to set tu user (can be ommited)")
+parser.add_argument("--delete", action="store_true", help="Delete user")
 
 args = parser.parse_args()
 
@@ -187,6 +190,15 @@ elif args.command == "web":
                 debug = True
 
         web.start_web_werver(args.port, args.listen, debug, db_file)
+
+elif args.command == "user":
+    if args.help == "help" or args.password is not None and args.delete == True or args.username is None:
+        _pcd.user_usage()
+    else:
+        if args.delete == True:
+            _pcd.user_del(args.username)
+        else:
+            _pcd.user_add(args.username, args.password)
 
 else:
     main_usage()
