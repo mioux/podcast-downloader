@@ -113,6 +113,24 @@
                 alert("No URL of podcast found (hidden by the author). Cannot proceed.");
             }
         }
+
+        function validateForm()
+        {
+            console.log($("#name").val())
+            console.log($("#url").val())
+
+            if ($("#name").val().trim() == "")
+            {
+                alert("Cannot add podcast without a name");
+                return false;
+            }
+            if ($("#url").val().trim() == "")
+            {
+                alert("Cannot add podcast without an URL");
+                return false;
+            }
+            return true;
+        }
     </script>
     <div>
         {% if is_new == 1 or found == 1 %}
@@ -222,7 +240,7 @@
                 <input type="hidden" id="total_days_value" name="total_days_value" value="{{ total_days_value }}"/>
             </div>
             <div class="form-group row">
-                <input type="submit" value="Save">
+                <input type="submit" value="Save" onclick="return validateForm();">
             </div>
         </form>
         <script>
