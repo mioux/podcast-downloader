@@ -6,6 +6,19 @@
 {% block inpagetitle %}Podcast list{% endblock %}
 
 {% block content %}
+    <script>
+        function confirmDelete(podcast_name)
+        {
+        if (confirm("Are you sure you want to delete " + podcast_name) == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        }
+  </script>
     <div>
         <table class="table table-striped" id="tbl_list">
             <thead>
@@ -27,7 +40,7 @@
                         <td class="align-middle"><a{% if podcast["enabled"] == 0 %} style="color: #808080;"{% endif %} href="{{ podcast["url"] }}">{{ podcast["name"] }}</a></td>
                         <td class="align-middle">{{ podcast["description"] | safe }}</td>
                         <td class="align-middle"><a href="{{ url_for('edit', edit_id=podcast["id"]) }}"><i class="bi bi-pencil"></i></a></td>
-                        <td class="align-middle"><a href="{{ url_for('delete', delete_id=podcast["id"]) }}"><i class="bi bi-x-octagon-fill" style="color: red;"></i></a></td>
+                        <td class="align-middle"><a href="{{ url_for('delete', delete_id=podcast["id"]) }}" onclick="return confirmDelete('{{ podcast["name"]|e }}');"><i class="bi bi-x-octagon-fill" style="color: red;"></i></a></td>
                         <td class="align-middle"><a href="{{ url_for("downloadPodcast", dl_id=podcast["id"]|int) }}"><i class="bi bi-cloud-download"></i></a></td>
                     </tr>
                 {% endfor %}

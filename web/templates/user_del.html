@@ -1,0 +1,22 @@
+{% set active = 'user' %}
+{% extends 'base.html' %}
+
+{% block title %}podcast-downloader - Delete user{% endblock %}
+
+{% block inpagetitle %}Delete {{ user_id }}{% endblock %}
+
+{% block content %}
+<div class="alert alert-warning" role="alert">
+  User {{ user_id }} has been deleted. Redirecting to users list in <span id="timeout">5</span>s.
+</div>
+<script>
+    setTimeout(function() {
+        window.location.href = '{{ url_for("users") }}';
+    }, 5000);
+    timeout = 5;
+    setInterval(function() {
+        timeout -= 1;
+        $("#timeout").text(timeout);
+    }, 1000);
+</script>
+{% endblock %}

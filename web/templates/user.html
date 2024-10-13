@@ -1,0 +1,95 @@
+{% set active = 'user' %}
+{% extends 'base.html' %}
+
+{% block title %}podcast-downloader - Users manager{% endblock %}
+
+{% block inpagetitle %}User{% if user_id is none %}s{% else %} {{ user_id }}{% endif %}{% endblock %}
+
+{% block content %}
+{% if user_id is none %}
+<script>
+  function confirmDelete(user_id)
+  {
+    if (confirm("Are you sure you want to delete " + user_id) == true)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+</script>
+<div>
+    <table class="table table-striped" id="tbl_list">
+        <thead>
+            <tr>
+                <th scope="col">Username</th>
+                <th scope="col" style="width: 25px;"><i class="bi bi-pen"></i></th>
+                <th scope="col" style="width: 25px;"><i class="bi bi bi-x-octagon-fill"></i></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td scope="row" class="align-middle">{{ user["username"] }}</td>
+                    <td class="align-middle"><a href="{{ url_for("user", user_id=user["username"]) }}"><i class="bi bi-pen"></i></a></td>
+                    <td class="align-middle">{% if current_user.id != user["username"] %}<a href="{{ url_for("user_del", user_id=user["username"]) }}" onclick="return confirmDelete('{{ user["username"]|e }}');"><i class="bi bi-x-octagon-fill" style="color: red;"></i></a>{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for("user", user_id="-") }}" class="btn btn-info" role="button">Add</a>
+</div>
+
+<script>
+    $(document).ready( function() { $('#tbl_list').DataTable(); });
+</script>
+{% else %}
+  <script>
+    function validateForm()
+    {
+        pwd = $("#password").val();
+        pwd_confirm = $("#password_confirm").val();
+
+        if (pwd != pwd_confirm)
+        {
+            $("#password_do_not_match").show();
+            setTimeout(function (){$("#password_do_not_match").hide();}, 5000);
+            return false;
+        }
+
+        if (pwd == pwd_confirm && pwd == "")
+        {
+            $("#password_empty").show();
+            setTimeout(function (){$("#password_empty").hide();}, 5000);
+            return false;
+        }
+
+        return true;
+    }
+
+  </script>
+  <div class="alert alert-danger" role="alert" style="display: none;" id="password_do_not_match">
+    Passwords do not match !
+  </div>
+  <div class="alert alert-danger" role="alert" style="display: none;" id="password_empty">
+    Passwords cannot be empty !
+  </div>
+  <form method="post" onsubmit="return validateForm()">
+    <div data-mdb-input-init class="form-outline mb-4">
+      <label class="form-label" for="username">User name</label>
+      <input type="text" id="username" class="form-control" name="username" {% if user_id != "" %}disabled readonly value="{{ user_id }}" {% endif %}/>
+    </div>
+    <div data-mdb-input-init class="form-outline mb-4">
+      <label class="form-label" for="password">Password</label>
+      <input type="password" id="password" class="form-control" name="password" />
+    </div>
+    <div data-mdb-input-init class="form-outline mb-4">
+      <label class="form-label" for="password">Confirm password</label>
+      <input type="password" id="password_confirm" class="form-control" name="password_confirm" />
+    </div>
+    <button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-primary btn-block mb-4">{% if user_id == "" %}Create user{% else %}Change password{% endif %}</button>
+  </form>
+{% endif %}
+{% endblock %}

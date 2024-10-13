@@ -202,8 +202,9 @@ def web_podcast_detail(self, id: int):
     row = curs.fetchone()
 
     data = {}
-    for idx, col in enumerate(curs.description):
-        data[col[0]] = row[idx]
+    if row is not None:
+        for idx, col in enumerate(curs.description):
+            data[col[0]] = row[idx]
 
     curs.close()
     con.commit()
@@ -274,3 +275,6 @@ def user_exists(self, username):
         return True
     else:
         return False
+
+def get_users(self):
+    return get_data(self.db_file, "SELECT username FROM users")

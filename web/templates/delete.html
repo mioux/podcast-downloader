@@ -3,16 +3,20 @@
 
 {% block title %}podcast-downloader web interface - DELETE{% endblock %}
 
-{% block inpagetitle %}Are you sure you want to delete {{ name }}?{% endblock %}
+{% block inpagetitle %}Podcast {{ name }} deleted{% endblock %}
 
 {% block content %}
-    <div>
-        <form method="POST">
-            <input type="hidden" name="delete_id" value="{{ delete_id }}">
-            <input type="submit">
-        </form>
+    <div class="alert alert-warning" role="alert">
+        Delete {{ name }} complete. Redirecting to podcasts list in <span id="timeout">5</span>s.
     </div>
-    <div>
-        <a href="{{ url_for('list') }}">NO! Take me to the podcast list instead!</a>
-    </div>
+    <script>
+        setTimeout(function() {
+            window.location.href = '{{ url_for("list") }}';
+        }, 5000);
+        timeout = 5;
+        setInterval(function() {
+            timeout -= 1;
+            $("#timeout").text(timeout);
+        }, 1000);
+    </script>
 {% endblock %}

@@ -23,7 +23,7 @@
             searchTerm = encodeURIComponent($("#search").val());
 
             urlToCal = 'https://itunes.apple.com/search?term=' + searchTerm + '&media=podcast';
-            
+
             $.ajax({
                 'url': '/proxy/' + encodeURIComponent(encodeURIComponent(urlToCal)), // Double encodeURIComponent to handle %2F
                 'type': 'GET',
@@ -43,7 +43,7 @@
             {
                 table_result.destroy()
             }
-            
+
             table_result = $("#table-result").DataTable(
                 {
                     "data": response.results,
@@ -105,6 +105,8 @@
                 $("#url").val(url);
                 if ($("#name").val() == "" && $("#url").val() != "")
                     setPodcastName();
+
+                $("#div-result").addClass("d-none");
             }
             else
             {

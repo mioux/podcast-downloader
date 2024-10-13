@@ -7,6 +7,17 @@
 
 {% block content %}
     <div class="alert alert-success" role="alert">
-        Download complete
+        Download complete. Redirecting to podcasts {% if go_to_podcast_history == True %}history{% else %}list{% endif %} in <span id="timeout">5</span>s.
     </div>
+    <script>
+        setTimeout(function() {
+            window.location.href = '{% if go_to_podcast_history == True %}url_for("history"){% else %}{{ url_for("list") }}{% endif %}';
+        }, 5000);
+        timeout = 5;
+        setInterval(function() {
+            if (timeout > 0)
+                timeout -= 1;
+            $("#timeout").text(timeout);
+        }, 1000);
+    </script>
 {% endblock %}

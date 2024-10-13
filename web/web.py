@@ -103,7 +103,7 @@ def unauthorized_handler():
 @app.route('/logout')
 def logout():
     flask_login.logout_user()
-    return redirect(url_for("login"), code=301)
+    return redirect(url_for("login"), code=302)
 
 @app.route('/')
 def index():
@@ -113,16 +113,12 @@ def index():
 @flask_login.login_required
 def delete(delete_id):
     podcast = _pcd.web_podcast_detail(delete_id)
+    _pcd.delete(delete_id)
 
-    if request.method == "POST":
-        delete_id = request.form["delete_id"]
-        _pcd.delete(delete_id)
-        return redirect(url_for("list"), code=302)
+    delete_id = podcast["id"] if "id" in podcast else -1
+    name = podcast["name"] if "name" in podcast else ""
 
-    if podcast is None:
-        return redirect(url_for("list"), code=302)
-
-    return render_template('delete.html', name=podcast["name"], delete_id=podcast["id"])
+    return render_template('delete.html', name=name, delete_id=delete_id)
 
 @app.route('/edit/<string:edit_id>', methods=['GET', 'POST'])
 @flask_login.login_required
@@ -305,8 +301,10 @@ def history():
 @app.route('/downloadItem/<int:dl_id>/<string:dl_url>')
 @flask_login.login_required
 def downloadItem(dl_id, dl_url):
-    _pcd.dl(dl_id=dl_id, dl_url=base64.b32decode(dl_url).decode("ascii") if dl_url is not None else None)
-    return render_template('download.html')
+    go_to_podcast_history = dl_url is not None
+
+    _pcd.dl(dl_id=dl_id, dl_url=base64.b32decode(dl_url).decode("ascii") if go_to_podcast_history == True else None)
+    return render_template('download.html', go_to_podcast_history=go_to_podcast_history)
 
 @app.route('/downloadPodcast/<int:dl_id>')
 @flask_login.login_required
@@ -372,6 +370,37 @@ def login():
         failed_login = True
 
     return render_template('login.html', nb_users=_pcd.get_nb_users(), failed_login=failed_login)
+
+@app.route('/users/')
+@flask_login.login_required
+def users():
+    users = _pcd.get_users()
+    return render_template('user.html', user_id=None, users=users)
+
+@app.route('/user/<string:user_id>', methods=['GET', 'POST'])
+@flask_login.login_required
+def user(user_id):
+    if user_id == "-":
+        user_id = ""
+
+    if request.method == 'GET':
+        return render_template('user.html', user_id=user_id)
+
+    username = user_id if user_id != "" else request.form['username']
+    password = request.form['password']
+
+    if(password != ""):
+        _pcd.user_add(username, password)
+
+    return redirect(url_for("users"), code=302)
+
+@app.route('/user_del/<string:user_id>')
+@flask_login.login_required
+def user_del(user_id):
+    if user_id != flask_login.current_user.get_id():
+        _pcd.user_del(user_id)
+
+    return render_template('user_del.html', user_id=user_id)
 
 @login_manager.unauthorized_handler
 def unauthorized_callback():

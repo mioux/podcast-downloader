@@ -2,7 +2,7 @@
 
 class pcd():
     from pcd.add import add, add_usage
-    from pcd.db import migrate_db, podcast_list, config_dump, web_list, web_history, web_podcast_detail, get_config, get_nb_users, check_user, user_exists
+    from pcd.db import migrate_db, podcast_list, config_dump, web_list, web_history, web_podcast_detail, get_config, get_nb_users, check_user, user_exists, get_users
     from pcd.delete import delete, delete_usage
     from pcd.edit import edit, edit_usage
     from pcd.download import dl, get_file
