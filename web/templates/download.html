@@ -11,7 +11,7 @@
     </div>
     <script>
         setTimeout(function() {
-            window.location.href = '{% if go_to_podcast_history == True %}url_for("history"){% else %}{{ url_for("list") }}{% endif %}';
+            window.location.href = '{% if go_to_podcast_history == True %}{{ url_for("history") }}{% else %}{{ url_for("list") }}{% endif %}';
         }, 5000);
         timeout = 5;
         setInterval(function() {
