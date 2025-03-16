@@ -6,7 +6,7 @@
 {% block inpagetitle %}{% if is_new == 1 %}Add{% else %}Edit{% endif %}{% endblock %}
 
 {% block content %}
-    <script language="javascript">
+    <script>
 
         var table_result;
 
@@ -141,7 +141,7 @@
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="name">Name</label>
-                <div class="col-sm-10"><input type="text" name="name" id="name" class="form-control" placeholder="Name of the current podcast" value="{{ podcast["name"] }}"></div>
+                <div class="col-sm-10"><input type="text" name="name" id="name" class="form-control" placeholder="Name of the current podcast" value="{{ podcast["name"] if podcast["name"] is not none }}"></div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="search">Search on <i class="fa fa-apple" aria-hidden="true" title="Apple"></i>Podcasts</label>
@@ -177,7 +177,7 @@
                 <label class="col-sm-2 col-form-label" for="url">URL</label>
                 <div class="col-sm-10">
                     <div class="input-group mb-3">
-                        <input type="text" name="url" id="url" class="form-control" placeholder="URL of the current podcast" value="{{ podcast["url"] }}" onchange="if ($('#name').val() == '' && $('#url').val() != '') setPodcastName()">
+                        <input type="text" name="url" id="url" class="form-control" placeholder="URL of the current podcast" value="{{ podcast["url"] if podcast["url"] is not none }}" onchange="if ($('#name').val() == '' && $('#url').val() != '') setPodcastName()">
                         <div class="input-group-apend">
                             <button class="btn btn-outline-secondary" type="button" onclick="setPodcastName()">Update name</button>
                         </div>
@@ -186,46 +186,50 @@
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="min_size">Minimal size</label>
-                <div class="col-sm-10"><input type="number" name="min_size" id="min_size" class="form-control" placeholder="Minimal size of the file to be downloaded (empty for none, in MB)" value="{{ podcast["min_size"] }}"></div>
+                <div class="col-sm-10"><input type="number" name="min_size" id="min_size" class="form-control" placeholder="Minimal size of the file to be downloaded (empty for none, in MB)" value="{{ podcast["min_size"] if podcast["min_size"] is not none }}"></div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="max_size">Maximal size</label>
-                <div class="col-sm-10"><input type="number" name="max_size" id="max_size" class="form-control" placeholder="Maximal size of the file to be downloaded (empty for none, in MB)" value="{{ podcast["max_size"] }}"></div>
+                <div class="col-sm-10"><input type="number" name="max_size" id="max_size" class="form-control" placeholder="Maximal size of the file to be downloaded (empty for none, in MB)" value="{{ podcast["max_size"] if podcast["max_size"] is not none }}"></div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="min_duration">Minimal duration</label>
-                <div class="col-sm-10"><input type="number" name="min_duration" id="min_duration" class="form-control" placeholder="Minimal duration of the podcast (empty for none, in seconds)" value="{{ podcast["min_duration"] }}"></div>
+                <div class="col-sm-10"><input type="number" name="min_duration" id="min_duration" class="form-control" placeholder="Minimal duration of the podcast (empty for none, in seconds)" value="{{ podcast["min_duration"] if podcast["min_duration"] is not none }}"></div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="max_duration">Maximal duration</label>
-                <div class="col-sm-10"><input type="number" name="max_duration" id="max_duration" class="form-control" placeholder="Maximal duration of the podcast (empty for none, in seconds)" value="{{ podcast["max_duration"] }}"></div>
+                <div class="col-sm-10"><input type="number" name="max_duration" id="max_duration" class="form-control" placeholder="Maximal duration of the podcast (empty for none, in seconds)" value="{{ podcast["max_duration"] if podcast["max_duration"] is not none }}"></div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="published_time_before">Published time before </label>
-                <div class="col-sm-10"><input type="time" step="1" name="published_time_before" id="published_time_before" class="form-control" value="{{ published_time_before_time }}"></div>
+                <div class="col-sm-10"><input type="time" step="1" name="published_time_before" id="published_time_before" class="form-control" value="{{ published_time_before_time if published_time_before_time is not none }}"></div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="published_time_after">Published time after</label>
-                <div class="col-sm-10"><input type="time" step="1" name="published_time_after" id="published_time_after" class="form-control" value="{{ published_time_after_time }}"></div>
+                <div class="col-sm-10"><input type="time" step="1" name="published_time_after" id="published_time_after" class="form-control" value="{{ published_time_after_time if published_time_after_time is not none }}"></div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="destination">Destination</label>
-                <div class="col-sm-10"><input type="text" name="destination" id="destination" class="form-control" placeholder="Destination folder" value="{{ podcast["destination"] }}"></div>
+                <div class="col-sm-10"><input type="text" name="destination" id="destination" class="form-control" placeholder="Destination folder" value="{{ podcast["destination"] if podcast["destination"] is not none }}"></div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="include">Include</label>
-                <div class="col-sm-10"><input type="text" name="include" id="include" class="form-control" placeholder="Regular expression to include" value="{{ podcast["include"] }}"></div>
+                <div class="col-sm-10"><input type="text" name="include" id="include" class="form-control" placeholder="Regular expression to include" value="{{ podcast["include"] if podcast["include"] is not none }}"></div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="exclude">Exclude</label>
-                <div class="col-sm-10"><input type="text" name="exclude" id="exclude" class="form-control" placeholder="Regular expression to exclude" value="{{ podcast["exclude"] }}"></div>
+                <div class="col-sm-10"><input type="text" name="exclude" id="exclude" class="form-control" placeholder="Regular expression to exclude" value="{{ podcast["exclude"] if podcast["exclude"] is not none }}"></div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="set_tags">Set tags after download</label>
+                <div class="col-sm-10"><input name="set_tags" id="set_tags" class="form-check-input" type="checkbox" {% if podcast["set_tags"] == 1 %}checked{% endif %}></div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="enabled">Enabled</label>
                 <div class="col-sm-10"><input name="enabled" id="enabled" class="form-check-input" type="checkbox" {% if podcast["enabled"] == 1 or is_new == 1 %}checked{% endif %}></div>
             </div>
             <div class="form-group row">
-                <label class="col-sm-2 col-form-label" for="enabled">Download days</label>
+                <label class="col-sm-2 col-form-label" for="download_days">Download days</label>
                 <div class="col-sm-10">
                     <select name="download_days" id="download_days" multiple>
                         <option value="1" {%  if has_mon == 1 or is_new == 1 %}selected{% endif %}>Monday</option>

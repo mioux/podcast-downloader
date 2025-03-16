@@ -9,7 +9,7 @@ def user_add(self, username: str, password: str):
         return
 
     while password is None or password.rstrip() == "":
-        getpwd = getpass("New password for {username}: ")
+        getpwd = getpass(f"New password for {username}: ")
         confirm = getpass("Confirm password: ")
         if getpwd == confirm:
             password = getpwd

@@ -3,7 +3,6 @@
 import os, sys, validators
 from pcd import pcd
 from pprint import pprint
-from web import web
 import argparse
 
 config_dir = os.path.join(os.path.expanduser('~'), ".config", "podcast-downloader")
@@ -51,6 +50,8 @@ def main_usage():
 os.makedirs(config_dir, exist_ok=True)
 
 _pcd.migrate_db()
+#Import web after DB migration as it is needed for "app" creation
+from web import web
 
 argc = len(sys.argv)
 
@@ -72,6 +73,7 @@ parser.add_argument("--include", action="store", help="Include titles containing
 parser.add_argument("--exclude", action="store", help="Exclude titles containing (regex)")
 parser.add_argument("--days", action="store", help="days of download (empty=all, [mon,tue,wed,thu,fri,sat,sun] )")
 parser.add_argument("--enabled", action="store", help="Enable download", choices=["0", "off", "no", "false", "disable", "disabled", "1", "on", "yes", "enabled", "enable", "true"])
+parser.add_argument("--set-tags", action="store", help="Set tags after downloading", choices=["0", "off", "no", "false", "disable", "disabled", "1", "on", "yes", "enabled", "enable", "true"])
 parser.add_argument("--port", action="store", help="Port to listen on. Admin privileges needed for ports < 1024", type=int, choices=range(1, 65535), default=8000, metavar="[1,65534]")
 parser.add_argument("--listen", action="store", help="Listen on IP", default="127.0.0.1")
 parser.add_argument("--debug", action="store", help="Debug web server", choices=["0", "off", "no", "false", "1", "on", "yes", "debug", "true"])
@@ -99,9 +101,15 @@ if args.command == "add":
         if args.days != "":
             download_days = stringToIntDays(args.days)
 
+        if args.enabled is not None:
+            enabled = (args.enabled in ["1", "on", "yes", "enabled", "enable", "true"])
+        if args.set_tags is not None:
+            set_tags = (args.set_tags in ["1", "on", "yes", "enabled", "enable", "true"])
+
         _pcd.add(url = args.url, name = args.name, min_size = args.min_size, max_size = args.max_size, destination = args.destination,
                  min_duration = args.min_duration, max_duration = args.max_duration, published_time_before = args.published_time_before,
-                 published_time_after = args.published_time_after, include = args.include, exclude = args.exclude, download_days = download_days)
+                 published_time_after = args.published_time_after, include = args.include, exclude = args.exclude, download_days = download_days,
+                 set_tags = set_tags, enabled = enabled)
 
 elif args.command == "delete":
     if args.help == "help":
@@ -120,6 +128,8 @@ elif args.command == "edit":
 
     if args.enabled is not None:
         enabled = (args.enabled in ["1", "on", "yes", "enabled", "enable", "true"])
+    if args.set_tags is not None:
+        set_tags = (args.set_tags in ["1", "on", "yes", "enabled", "enable", "true"])
 
     if edit_uuid is None:
         _pcd.edit_usage()
@@ -151,6 +161,8 @@ elif args.command == "edit":
             changed = _pcd.edit(edit_uuid, "exclude", args.exclude) or changed
         if download_days is not None:
             changed = _pcd.edit(edit_uuid, "download_days", download_days) or changed
+        if download_days is not None:
+            changed = _pcd.edit(edit_uuid, "set_tags", set_tags) or changed
 
         if changed == True:
             print (edit_uuid + " edited successfully")

@@ -20,7 +20,8 @@ def add_usage(self):
 
 def add(self, url = "", name = "", min_size = None, max_size = None,
         min_duration = None, max_duration = None, published_time_before = None, published_time_after = None, add_uuid = None,
-        destination = None, enabled = True, include = "", exclude = "", download_days = 127) -> str:
+        destination = None, enabled = True, include = "", exclude = "", download_days = 127,
+        set_tags = False) -> str:
 
     if add_uuid is None: add_uuid = str(uuid.uuid4())
 
@@ -40,16 +41,16 @@ def add(self, url = "", name = "", min_size = None, max_size = None,
             INSERT INTO podcast (
                 uuid, name, url, min_size, max_size,
                 destination, min_duration, max_duration, published_time_before, published_time_after,
-                enabled, include, exclude, download_days
+                enabled, include, exclude, download_days, set_tags
         )
         VALUES (
                 :add_uuid, :name, :url, :min_size, :max_size,
                 :destination, :min_duration, :max_duration, :published_time_before, :published_time_after,
-                :enabled, :include, :exclude, :download_days)""",
+                :enabled, :include, :exclude, :download_days, :set_tags)""",
             {
                 'add_uuid': add_uuid, 'name': name, 'url': url, 'min_size': min_size, 'max_size': max_size,
                 'destination': destination, 'min_duration': min_duration, 'max_duration': max_duration, 'published_time_before': published_time_before, 'published_time_after': published_time_after,
-                'enabled': enabled, 'include': include, 'exclude': exclude, 'download_days': download_days
+                'enabled': enabled, 'include': include, 'exclude': exclude, 'download_days': download_days, 'set_tags': set_tags
             })
 
         print (add_uuid + " (" + name + ") added successfully")

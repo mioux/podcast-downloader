@@ -64,7 +64,6 @@ template_folder = os.path.realpath(template_folder)
 static_folder = os.path.join(os.path.dirname(__file__), "statics")
 static_folder = os.path.realpath(static_folder)
 
-
 app = Flask("Podcast downloader webapp control",
                 template_folder=template_folder,
                 static_folder=static_folder)
@@ -153,6 +152,9 @@ def edit(edit_id):
         enabled = False
         if "enabled" in data:
             enabled = data["enabled"].lower() == "on"
+        set_tags = False
+        if "set_tags" in data:
+            set_tags = data["set_tags"].lower() == "on"
 
         if validators.url(url) == False:
             valid = False
@@ -178,7 +180,8 @@ def edit(edit_id):
             _pcd.add(url=url, name=name, min_size=min_size,
                      max_size=max_size, min_duration=min_duration, max_duration=max_duration,
                      published_time_before=published_time_before_int, published_time_after=published_time_after_int, destination=destination,
-                     enabled=enabled, include=include, exclude=exclude, download_days = download_days)
+                     enabled=enabled, include=include, exclude=exclude, download_days = download_days,
+                     set_tags = set_tags)
             return redirect(url_for("list"), code=302)
         elif valid == True:
             _pcd.edit(uuid=id, key="name", value=name, flask_update=True)
@@ -194,6 +197,7 @@ def edit(edit_id):
             _pcd.edit(uuid=id, key="include", value=include, flask_update=True)
             _pcd.edit(uuid=id, key="exclude", value=exclude, flask_update=True)
             _pcd.edit(uuid=id, key="download_days", value=download_days, flask_update=True)
+            _pcd.edit(uuid=id, key="set_tags", value=set_tags, flask_update=True)
             return redirect(url_for("list"), code=302)
 
     else:

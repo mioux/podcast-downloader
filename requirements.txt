@@ -9,3 +9,4 @@ Pillow
 argparse
 flask-login
 bcrypt
+mutagen

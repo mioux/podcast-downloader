@@ -1,11 +1,19 @@
 #!/bin/env python3
 
-import feedparser, os, sqlite3, requests, pathlib, datefinder, datetime, time, re, sys, io
+import mutagen.mp3
+import feedparser, os, sqlite3, requests, pathlib, datefinder, datetime, re, sys, io, mutagen
 from PIL import Image
-from urllib.request import urlopen
 
 config_dir = os.path.join(os.path.expanduser('~'), ".config", "podcast-downloader")
 db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
+
+def set_file_tags(file_dest, pc_title, author, title, description, category):
+    m = mutagen.File(file_dest, easy=True)
+    m["title"] = title
+    m["artist"] = author
+    m["album"] = pc_title
+    m["genre"] = category
+    m.save(v2_version=3, v1=1)
 
 def dl_usage(self):
 
@@ -49,7 +57,8 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
 
     curs.execute("""SELECT uuid, url, name, min_size, max_size,
                             destination, min_duration, max_duration, published_time_before, published_time_after,
-                            include, exclude, download_days, image, description
+                            include, exclude, download_days, image, description,
+                            set_tags
                  FROM podcast WHERE :dl_id IS NULL AND enabled = 1 OR CAST(:dl_id_str AS VARCHAR(36)) IN (CAST(id AS VARCHAR(36)), uuid)""", {'dl_id': dl_id, 'dl_id_str': str(dl_id)})
 
     data = curs.fetchall()
@@ -70,6 +79,7 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
         download_days = 127 if line[12] is None else line[12]
         last_image = "" if line[13] is None else line[13]
         description = "" if line[14] is None else line[14]
+        set_tags = False if line[15] is None or line[15] == 0 else True
 
         if published_time_before == 0: published_time_before = 240000
 
@@ -109,8 +119,13 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
             curs.execute("UPDATE podcast SET description = :description WHERE uuid = :uuid", {'description': description, 'uuid': uuid})
             con.commit()
 
+        pc_title = rss.feed.get("title", name)
         for entry in rss.entries:
-            title = entry["title"]
+            title = entry.get("title", "")
+            description = entry.get("description", "")
+            extrenal_link = entry.get("link", "")
+            author = entry.get("author")
+            category = entry.get("category")
 
             do_download = dl_episodes
 
@@ -162,13 +177,6 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
                 if duration < min_duration or (duration > max_duration and max_duration != 0):
                     do_download = False
 
-            description = ""
-            if "description" in entry:
-                description = entry["description"]
-
-            extrenal_link = ""
-            if "link" in entry:
-                extrenal_link = entry["link"]
 
             for link in entry["links"]:
                 if link["type"][0:5].lower() != "text/":
@@ -193,6 +201,8 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
                             os.makedirs(destination, exist_ok=True)
                             with open(file_dest, 'wb') as fd:
                                 fd.write(file_content.content)
+                            if set_tags == True:
+                                set_file_tags(file_dest, pc_title, author, title, description, category)
 
                         if do_download == True or dl_url is None:
 

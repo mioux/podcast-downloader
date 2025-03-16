@@ -19,6 +19,7 @@ def migrate_db(self):
     version = curs.fetchone()[0]
 
     if version == '0':
+        print(f'Migration v{version} => v{int(version) + 1}')
         curs.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='downloaded';")
 
         if curs.fetchone()[0] == 0:
@@ -29,6 +30,7 @@ def migrate_db(self):
         version = '1'
 
     if version == '1':
+        print(f'Migration v{version} => v{int(version) + 1}')
         curs.execute("""
           CREATE TABLE podcast (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,6 +81,7 @@ def migrate_db(self):
         version = '2'
 
     if version == '2':
+        print(f'Migration v{version} => v{int(version) + 1}')
         curs.execute("ALTER TABLE downloaded ADD name VARCHAR(1024)")
         curs.execute("ALTER TABLE downloaded ADD description TEXT")
         curs.execute("ALTER TABLE downloaded ADD dl_time DATETIME")
@@ -89,6 +92,7 @@ def migrate_db(self):
         version = '3'
 
     if version == '3':
+        print(f'Migration v{version} => v{int(version) + 1}')
         curs.execute("ALTER TABLE downloaded ADD external_link VARCHAR(1024)")
         curs.execute("UPDATE downloaded SET external_link = ''")
         curs.execute("UPDATE config SET configvalue = '4' WHERE configname = 'DB_VERSION';")
@@ -96,6 +100,7 @@ def migrate_db(self):
         version = '4'
 
     if version == '4':
+        print(f'Migration v{version} => v{int(version) + 1}')
         curs.execute("ALTER TABLE podcast ADD include VARCHAR(1024)")
         curs.execute("ALTER TABLE podcast ADD exclude VARCHAR(1024)")
         curs.execute("UPDATE config SET configvalue = '5' WHERE configname = 'DB_VERSION';")
@@ -103,6 +108,7 @@ def migrate_db(self):
         version = '5'
 
     if version == '5':
+        print(f'Migration v{version} => v{int(version) + 1}')
         curs.execute("ALTER TABLE podcast ADD download_days INT")
         # This is a bitmask starting from Monday
         # SSFTWTM : 0101010 = Tuesday + Thursday + Staurday
@@ -116,6 +122,7 @@ def migrate_db(self):
         version = '6'
 
     if version == '6':
+        print(f'Migration v{version} => v{int(version) + 1}')
         curs.execute("ALTER TABLE podcast ADD image VARCHAR(1024)")
         curs.execute("ALTER TABLE podcast ADD image_cache TEXT")
         curs.execute("ALTER TABLE downloaded ADD image VARCHAR(1024)")
@@ -125,12 +132,14 @@ def migrate_db(self):
         version = '7'
 
     if version == '7':
+        print(f'Migration v{version} => v{int(version) + 1}')
         curs.execute("ALTER TABLE podcast ADD description TEXT")
         curs.execute("UPDATE config SET configvalue = '8' WHERE configname = 'DB_VERSION';")
         con.commit()
         version = '8'
 
     if version == '8':
+        print(f'Migration v{version} => v{int(version) + 1}')
         str_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-!:;,?./§*µù%^¨$£&é'()-è_çà=~#[]|`@"
         app_secret = ''.join(random.choice(str_chars) for i in range(128))
         curs.execute("INSERT INTO config(configname, configvalue) VALUES ('APP_SECRET', :app_secret)", {'app_secret': app_secret})
@@ -138,6 +147,14 @@ def migrate_db(self):
         curs.execute("CREATE TABLE users (username VARCHAR(128) PRIMARY KEY, password varchar(128))")
         con.commit()
         version = '9'
+
+    if version == '9':
+        print(f'Migration v{version} => v{int(version) + 1}')
+        curs.execute("ALTER TABLE podcast ADD set_tags BIT DEFAULT (0)")
+        curs.execute("UPDATE podcast SET set_tags = 0")
+        curs.execute("UPDATE config SET configvalue = '10' WHERE configname = 'DB_VERSION';")
+        con.commit()
+        version = '10'
 
     con.close()
 
