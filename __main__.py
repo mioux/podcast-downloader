@@ -169,9 +169,9 @@ elif args.command == "edit":
             changed = _pcd.edit(edit_uuid, "set_tags", set_tags) or changed
 
         if changed == True:
-            print (edit_uuid + " edited successfully")
+            print (f"Podcast \"{edit_uuid}\" edited successfully")
         else:
-            print (edit_uuid + " : no changes were made")
+            print (f"Podcast \"{edit_uuid}\" : no changes were made")
 
 elif args.command == "list":
     if args.help == "help":
