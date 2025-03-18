@@ -103,8 +103,12 @@ if args.command == "add":
 
         if args.enabled is not None:
             enabled = (args.enabled in ["1", "on", "yes", "enabled", "enable", "true"])
+        else:
+            enabled = True
         if args.set_tags is not None:
             set_tags = (args.set_tags in ["1", "on", "yes", "enabled", "enable", "true"])
+        else:
+            set_tags = False
 
         _pcd.add(url = args.url, name = args.name, min_size = args.min_size, max_size = args.max_size, destination = args.destination,
                  min_duration = args.min_duration, max_duration = args.max_duration, published_time_before = args.published_time_before,
@@ -159,9 +163,9 @@ elif args.command == "edit":
             changed = _pcd.edit(edit_uuid, "include", args.include) or changed
         if args.exclude is not None:
             changed = _pcd.edit(edit_uuid, "exclude", args.exclude) or changed
-        if download_days is not None:
+        if args.days is not None:
             changed = _pcd.edit(edit_uuid, "download_days", download_days) or changed
-        if download_days is not None:
+        if args.set_tags is not None:
             changed = _pcd.edit(edit_uuid, "set_tags", set_tags) or changed
 
         if changed == True:

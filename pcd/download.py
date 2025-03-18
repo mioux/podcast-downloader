@@ -4,15 +4,18 @@ import mutagen.mp3
 import feedparser, os, sqlite3, requests, pathlib, datefinder, datetime, re, sys, io, mutagen
 from PIL import Image
 
+
 config_dir = os.path.join(os.path.expanduser('~'), ".config", "podcast-downloader")
 db_file = os.path.join(config_dir, "podcast-downloader.sqlite3")
 
 def set_file_tags(file_dest, pc_title, author, title, description, category):
     m = mutagen.File(file_dest, easy=True)
-    m["title"] = title
-    m["artist"] = author
-    m["album"] = pc_title
-    m["genre"] = category
+
+
+    m["title"]  = title    if isinstance(m["title"],  str) else [title]
+    m["artist"] = author   if isinstance(m["artist"], str) else [author]
+    m["album"]  = pc_title if isinstance(m["album"],  str) else [pc_title]
+    m["genre"]  = category if isinstance(m["genre"],  str) else [category]
     m.save(v2_version=3, v1=1)
 
 def dl_usage(self):
