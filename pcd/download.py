@@ -135,7 +135,7 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
             if dl_url is None:
                 if include != "":
                     try:
-                        if re.search(include, title, re.IGNORECASE) is None:
+                        if re.search(include, title, re.IGNORECASE | re.MULTILINE) is None:
                             do_download = False
                     except Exception as exp:
                         print("Invalid \"include\" regular expression: ", file=sys.stderr)
@@ -146,7 +146,7 @@ def dl(self, dl_episodes = True, dl_id = None, dl_url = None):
 
                 if exclude != "":
                     try:
-                        if re.search(exclude, title, re.IGNORECASE) is not None:
+                        if re.search(exclude, title, re.IGNORECASE | re.MULTILINE) is not None:
                             do_download = False
                     except Exception as exp:
                         print("Invalid \"include\" regular expression: ", file=sys.stderr)
